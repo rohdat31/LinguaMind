@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>LinguaMind</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#060a12;font-family:'Inter',system-ui,sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;}
+:root{--c1:#6366f1;--c2:#8b5cf6;--c3:#10b981;--c4:#f59e0b;--c5:#ef4444;--c6:#f97316;}
+.syne{font-family:'Syne',system-ui,sans-serif;font-weight:900;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px;}
+select option{background:#0d1117;color:#fff;}
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.85);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fadeUp{animation:fadeUp .28s ease both;}
+.pop{animation:pop .25s ease both;}
+.pulse{animation:pulse 1.8s ease infinite;}
+/* Cards */
+.card{border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);transition:transform .2s,box-shadow .2s;}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3);}
+.glow:hover{box-shadow:0 0 28px rgba(99,102,241,.2);}
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:30px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid transparent;transition:all .15s;white-space:nowrap;background:none;}
+/* Inputs */
+.inp{width:100%;padding:9px 13px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:13px;outline:none;font-family:inherit;}
+.inp:focus{border-color:rgba(99,102,241,.5);background:rgba(255,255,255,.07);}
+/* Strength bar */
+.sbar{height:4px;border-radius:4px;background:rgba(255,255,255,.08);}
+.sbar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+/* Flip card */
+.flip-card{perspective:1200px;}
+.flip-inner{transition:transform .5s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;position:relative;width:100%;height:100%;}
+.flip-inner.flipped{transform:rotateY(180deg);}
+.flip-f,.flip-b{backface-visibility:hidden;-webkit-backface-visibility:hidden;position:absolute;inset:0;border-radius:18px;}
+.flip-b{transform:rotateY(180deg);}
+/* Overlay */
+.overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.8);backdrop-filter:blur(16px);}
+/* Modal */
+.modal{width:100%;border-radius:22px;background:#0c1018;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 80px rgba(0,0,0,.7);overflow:hidden;}
+/* Toast */
+.toast{padding:9px 18px;border-radius:20px;font-size:13px;font-weight:600;backdrop-filter:blur(12px);white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.5);}
+/* Button base */
+.btn{padding:10px 16px;border-radius:13px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 4px 18px rgba(79,70,229,.35);}
+.btn-primary:hover{opacity:.9;}
+.btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.65);}
+.btn-ghost:hover{background:rgba(255,255,255,.1);}
+.btn-green{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;}
+.btn-cyan{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.3);color:#22d3ee;}
+.btn-purple{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:#c084fc;}
+.btn-amber{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(249,115,22,.15));border:1px solid rgba(245,158,11,.35);color:#fcd34d;}
+/* Tab */
+.tab-bar{display:flex;gap:4px;padding:4px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);width:fit-content;}
+.tab-btn{padding:8px 16px;border-radius:12px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;background:transparent;color:rgba(255,255,255,.45);}
+.tab-btn.active{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 4px 18px rgba(79,70,229,.4);}
+/* Grid helpers */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+/* Mobile safe area */
+@supports(padding:max(0px)){
+  .pb-safe{padding-bottom:max(80px,env(safe-area-inset-bottom)+16px);}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Preact + htm standalone — 15KB, works offline, no Babel needed -->
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/preact/standalone.umd.js"></script>
+<script>
+'use strict';
+// ── Destructure from htm/preact standalone ──────────────────
+const {html,render,useState,useEffect,useRef,useCallback,useMemo,useReducer}=htmPreact;
+
+// ═══════════════════════════════════════════════════════════════
+// DATA & CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const CATS={
+  noun:      {label:"Noun",       icon:"📌",color:"#6366f1",bg:"rgba(99,102,241,.15)",border:"rgba(99,102,241,.35)"},
+  verb:      {label:"Verb",       icon:"⚡",color:"#10b981",bg:"rgba(16,185,129,.15)", border:"rgba(16,185,129,.35)"},
+  adjective: {label:"Adjective",  icon:"✨",color:"#f59e0b",bg:"rgba(245,158,11,.15)",border:"rgba(245,158,11,.35)"},
+  adverb:    {label:"Adverb",     icon:"🏃",color:"#f97316",bg:"rgba(249,115,22,.15)",border:"rgba(249,115,22,.35)"},
+  connector: {label:"Connector",  icon:"🔗",color:"#a855f7",bg:"rgba(168,85,247,.15)",border:"rgba(168,85,247,.35)"},
+  verbal_phrase:{label:"Verbal Phrase",icon:"💬",color:"#06b6d4",bg:"rgba(6,182,212,.15)",border:"rgba(6,182,212,.35)"},
+  irregular_verb:{label:"Irregular Verb",icon:"🔄",color:"#ef4444",bg:"rgba(239,68,68,.15)",border:"rgba(239,68,68,.35)"},
+  phrase:    {label:"Phrase",     icon:"💭",color:"#ec4899",bg:"rgba(236,72,153,.15)",border:"rgba(236,72,153,.35)"},
+  idiom:     {label:"Idiom",      icon:"🎭",color:"#84cc16",bg:"rgba(132,204,22,.15)",border:"rgba(132,204,22,.35)"},
+};
+
+const VK="lm_vocab_v3",SK="lm_sr_v3",STK="lm_streak";
+const SR_DAYS=[1,3,7,14,30,90];
+
+const DEFAULT_VOCAB=[
+  {id:1,word:"Perseverance",phonetic:"/ˌpɜː.sɪˈvɪər.əns/",type:"noun",translation:"Perseverancia",definition:"Continued effort despite difficulties.",examples:["Her perseverance paid off.","Success requires perseverance."],level:"B2",tags:["character"],addedAt:Date.now()-86400000},
+  {id:2,word:"Eloquent",phonetic:"/ˈel.ə.kwənt/",type:"adjective",translation:"Elocuente",definition:"Fluent or persuasive in speaking.",examples:["She gave an eloquent speech.","His writing style is eloquent."],level:"C1",tags:["communication"],addedAt:Date.now()-172800000},
+  {id:3,word:"Give up",phonetic:"/ɡɪv ʌp/",type:"verbal_phrase",translation:"Rendirse",definition:"To stop trying.",examples:["Don't give up on your dreams.","She gave up smoking."],particle:"up",level:"B1",tags:["daily"],addedAt:Date.now()-259200000},
+  {id:4,word:"However",phonetic:"/haʊˈev.ər/",type:"connector",translation:"Sin embargo",definition:"Used to contrast two ideas.",examples:["I was tired; however, I continued."],usage:"contrast",level:"B1",tags:["academic"],addedAt:Date.now()-345600000},
+  {id:5,word:"Go",phonetic:"/ɡoʊ/",type:"irregular_verb",translation:"Ir",definition:"To move from one place to another.",examples:["I go to work every day.","She went to Paris."],past:"went",past_participle:"gone",level:"A1",tags:["daily"],addedAt:Date.now()-432000000},
+];
+
+function loadVocab(){try{const d=localStorage.getItem(VK);if(d)return JSON.parse(d);}catch(e){}return DEFAULT_VOCAB;}
+function saveVocab(a){try{localStorage.setItem(VK,JSON.stringify(a));}catch(e){}}
+function loadSR(){try{const d=localStorage.getItem(SK);if(d)return JSON.parse(d);}catch(e){}return{};}
+function saveSR(s){try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}}
+function loadStreak(){try{const d=localStorage.getItem(STK);if(d)return JSON.parse(d);}catch(e){}return{streak:0,lastDate:null};}
+function saveStreak(s){try{localStorage.setItem(STK,JSON.stringify(s));}catch(e){}}
+
+function updateStreak(){
+  const today=new Date().toDateString();
+  const s=loadStreak();
+  if(s.lastDate===today)return s.streak;
+  const yest=new Date(Date.now()-86400000).toDateString();
+  const ns=s.lastDate===yest?s.streak+1:1;
+  saveStreak({streak:ns,lastDate:today});
+  return ns;
+}
+
+function getSREntry(sr,id){return sr[id]||{strength:0,nextReview:0,reviews:0};}
+function nextReviewDate(strength,rating){
+  const ns=rating==="easy"?Math.min(5,strength+1):rating==="hard"?0:strength;
+  const d=SR_DAYS[ns]||1;
+  return{strength:ns,nextReview:Date.now()+d*86400000};
+}
+function getDueWords(vocab,sr){const now=Date.now();return vocab.filter(w=>getSREntry(sr,w.id).nextReview<=now);}
+function getStrengthColor(s){return s===0?"#4b5563":s<=1?"#ef4444":s<=2?"#f97316":s<=3?"#f59e0b":s<=4?"#10b981":"#6366f1";}
+
+// ─── VOICE ENGINE ──────────────────────────────────────────
+let _voices=[];
+function lv(){_voices=window.speechSynthesis?window.speechSynthesis.getVoices():[];}
+if(window.speechSynthesis){lv();window.speechSynthesis.onvoiceschanged=lv;}
+
+const EN_PRI=["Google US English","Google UK English Female","Samantha","Karen","Daniel","Moira","Alex","Microsoft Aria Online (Natural)","Microsoft Jenny Online (Natural)","Microsoft Aria","Microsoft Jenny"];
+const ES_PRI=["Google español de Estados Unidos","Google español","Paulina","Mónica","Jorge","Microsoft Sabina Online (Natural)","Microsoft Dalia Online (Natural)","Microsoft Sabina","Microsoft Raul"];
+function pickVoice(lang){
+  const all=_voices.length?_voices:window.speechSynthesis.getVoices();
+  const p=lang==="es"?ES_PRI:EN_PRI;const lc=lang==="es"?"es":"en";
+  for(const n of p){const v=all.find(x=>x.name===n);if(v)return v;}
+  for(const n of p){const v=all.find(x=>x.name.toLowerCase().includes(n.toLowerCase()));if(v)return v;}
+  return all.filter(x=>x.lang.startsWith(lc)&&x.localService)[0]||all.find(x=>x.lang.startsWith(lc))||null;
+}
+const isES=t=>/\b(hola|que|con|por|las|los|del|como|más|también|cuando|hay|ser|muy|bien|tiene|está|pero|si|en|es|de|al|la|lo|el|no|un|te)\b/.test(t.toLowerCase().slice(0,100));
+function speak(text,onEnd,fl){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const lang=fl||(isES(text)?"es":"en");
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang==="es"?"es-US":"en-US";u.rate=0.95;u.pitch=1.0;u.volume=1.0;
+  const go=()=>{const v=pickVoice(lang);if(v){u.voice=v;u.lang=v.lang;}if(onEnd)u.onend=onEnd;window.speechSynthesis.speak(u);};
+  if(_voices.length)go();else{window.speechSynthesis.onvoiceschanged=()=>{lv();window.speechSynthesis.onvoiceschanged=null;go()};}
+}
+
+// ─── AUTO-CLASSIFIER ──────────────────────────────────────
+const IRREG_SET=new Set("go,be,have,do,say,get,make,know,think,take,come,see,look,want,give,use,find,tell,ask,seem,feel,try,leave,call,keep,let,begin,show,hear,play,run,move,live,hold,bring,happen,write,provide,sit,stand,lose,pay,meet,include,set,learn,lead,understand,watch,build,stay,fall,cut,reach,choose,break,catch,draw,drink,drive,eat,fly,forget,freeze,hide,hit,hurt,lay,lie,ring,rise,sell,shoot,shut,sing,sleep,steal,strike,swim,teach,throw,wake,wear,bite,blow,deal,dig,feed,fight,flee,fling,hang,kneel,lend,mean,ride,see,sew,shed,shine,shrink,slay,sling,slit,sow,speak,speed,spell,spill,spin,spit,split,spread,spring,stink,strew,stride,strive,swear,sweep,thrust,tread,weave,weep,wring,win,sit,cut,put,quit,read,set,shut,split,burst,bet,bid,bind,bleed,breed,creep,dig,flee,grind,grow,hit,hold,hurt,kneel,lay,lend,lose,mean,meet,rid,ring,rise,run,seek,sell,send,shake,shine,shoot,show,shrink,sing,sleep,speak,spend,spin,stand,steal,stick,sting,stink,strike,swear,sweep,swim,swing,take,teach,tear,tell,think,throw,understand,wake,wear,win,wind,withdraw,wring".split(","));
+const CONN_SET=new Set("however,therefore,moreover,furthermore,nevertheless,nonetheless,although,though,whereas,meanwhile,consequently,subsequently,accordingly,hence,thus,besides,otherwise,instead,indeed,certainly,similarly,likewise,conversely,alternatively,additionally,in addition,in contrast,on the other hand,as a result,for instance,for example,in fact,in conclusion,to sum up,not only,but also,even though,as long as,as soon as,in order to,so that,due to,because of,in spite of,apart from".split(","));
+
+function autoClassify(word){
+  if(!word||word.length<2)return null;
+  const w=word.toLowerCase().trim(),ws=w.split(/\s+/);
+  if(ws.length>=2){
+    if(CONN_SET.has(w))return"connector";
+    if(IRREG_SET.has(ws[0]))return"verbal_phrase";
+    return"phrase";
+  }
+  if(CONN_SET.has(w))return"connector";
+  if(IRREG_SET.has(w))return"irregular_verb";
+  if(/ly$/.test(w)&&w.length>4&&!/^(family|early|only|daily|holy|ugly|wily|rely|ally)$/.test(w))return"adverb";
+  if(/(tion|sion|ment|ness|ity|ance|ence|ship|hood|dom|ism|age|ure|ture)$/.test(w))return"noun";
+  if(/(ful|less|ous|ious|ive|ical|ic|ish|able|ible|ent|ant)$/.test(w))return"adjective";
+  if(/(ize|ise|ify|ate)$/.test(w))return"verb";
+  return null;
+}
+function classifyConf(word,type){
+  if(!type)return 0;
+  const w=word.toLowerCase().trim();
+  if(IRREG_SET.has(w)&&type==="irregular_verb")return 99;
+  if(CONN_SET.has(w)&&type==="connector")return 99;
+  if(w.split(/\s+/).length>=2)return 88;
+  if(/ly$/.test(w)&&type==="adverb")return 92;
+  if(/(tion|ment|ness)$/.test(w)&&type==="noun")return 93;
+  if(/(ful|less|ous|able)$/.test(w)&&type==="adjective")return 91;
+  if(/(ize|ify|ate)$/.test(w)&&type==="verb")return 90;
+  return 72;
+}
+
+// ─── PHRASE ENGINE ────────────────────────────────────────
+const PTIPS={"θ":"'th' suave (think)","ð":"'th' sonoro (this)","æ":"'a' abierta (cat)","ɪ":"'i' corta (bit)","ʌ":"'a' breve (cup)","ɜː":"'er' (bird)","ʃ":"'sh' (she)","tʃ":"'ch' (church)","dʒ":"'j' (jump)","ŋ":"'ng' (sing)"};
+function ptip(ph=""){for(const[s,t]of Object.entries(PTIPS)){if(ph.includes(s))return`${s} → ${t}`;}return null;}
+const TCTX={character:"conversación personal",motivation:"hablar de metas",communication:"expresarte mejor",academic:"entorno universitario",business:"en el trabajo",daily:"conversación cotidiana"};
+function gctx(w){return TCTX[(w.tags||[])[0]]||"conversación general";}
+const TPL={
+  noun:[["She showed remarkable {W} throughout the entire challenge.",[]],["True {W} separates great leaders from good ones.",[]],["His {A} approach was a sign of real {W}.",["adjective"]],["The key to success is combining {W} with {N}.",["noun"]],["Developing {W} takes time, but it's worth it.",[]],["Her {W} helped her overcome every obstacle.",[]],["Can you believe how much {W} she has shown?",[]],["I admire his {N} and his {W} in difficult moments.",["noun"]],],
+  adjective:[["Her {W} explanation made everything crystal clear.",[]],["Being {W}, he always finds the right words.",[]],["His {W} response showed great {N}.",["noun"]],["A {W} approach combined with {N} takes you far.",["noun"]],["It was {W} of her to explain it so simply.",[]],["The {W} presentation impressed everyone.",[]],["I would say her work is {W}, wouldn't you agree?",[]],["She was {W} and precise — the perfect combination.",[]],],
+  verb:[["She managed to {W} despite all the obstacles.",[]],["Learning to {W} effectively is a sign of {N}.",["noun"]],["The best way to {W} is to practice daily.",[]],["We should all try to {W} more often.",[]],["It takes courage to {W} in this situation.",[]],["He taught me how to {W} with grace.",[]],["She was the first person to {W} and it mattered.",[]],["Could you {W} again? I want to be sure.",[]],],
+  adverb:[["She spoke {W} and clearly during the presentation.",[]],["He responded {W}, showing great {N}.",["noun"]],["She {W} accepted the challenge with a smile.",[]],["I was surprised by how {W} he handled it.",[]],["She communicates {W} — that makes her effective.",[]],["When you speak {W}, people listen more carefully.",[]],],
+  connector:[["I was tired; {W}, I kept going.",[]],["It's expensive; {W}, it's worth every penny.",[]],["She studied hard; {W}, she felt nervous.",[]],["The plan was risky; {W}, we decided to try.",[]],["{W}, the results were better than expected.",[]],],
+  verbal_phrase:[["Don't {W} — keep trying no matter what.",[]],["She decided to {W} on the project.",[]],["He always {W} his responsibilities at work.",[]],["They managed to {W} despite all difficulties.",[]],["You should {W} the meaning before using it.",[]],],
+  irregular_verb:[["She {W} to the market and came back happy.",[]],["He has {W} to three different countries.",[]],["Have you ever {W} something you regret?",[]],["They {W} together for many years.",[]],["I have never {W} anything like this before.",[]],],
+  phrase:[["People often use '{W}' to express {N} naturally.",["noun"]],["She used the expression '{W}' perfectly.",[]],["Using '{W}' shows a high level of fluency.",[]],["In English, we say '{W}' to convey an important idea.",[]],["'{W}' is one of the most useful phrases to know.",[]],],
+  idiom:[["She used '{W}' perfectly in that conversation.",[]],["When someone says '{W}', it usually means {N}.",["noun"]],["Using '{W}' shows deep English cultural knowledge.",[]],["He dropped '{W}' and everyone understood.",[]],["'{W}' is a great way to sound natural.",[]],],
+};
+function buildPhrases(target,all){
+  const sh=a=>[...a].sort(()=>Math.random()-.5);
+  const bt={};all.forEach(w=>{if(w.id!==target.id)(bt[w.type]=bt[w.type]||[]).push(w);});
+  const pick=t=>bt[t]?sh(bt[t])[0]:null;
+  const pool=sh([...(TPL[target.type]||TPL.noun)]);
+  const used=new Set();const res=[];
+  for(const [tpl,vars] of pool){
+    if(res.length>=5)break;
+    const sw={};let ok=true;
+    for(const v of vars){const w=pick(v);if(!w){ok=false;break;}sw[v]=w;}
+    if(!ok)continue;
+    const phrase=tpl.replace(/\{W\}/g,target.word).replace(/\{N\}/g,sw.noun?.word||"success").replace(/\{A\}/g,sw.adjective?.word||"great");
+    if(used.has(phrase))continue;
+    used.add(phrase);
+    const wu=[target.word,...Object.values(sw).map(w=>w.word)];
+    res.push({phrase,context:gctx(target),tip:ptip(target.phonetic),level:target.level||"B1",wu});
+  }
+  const fb=["'{W}' appears often in real conversations.","Can you use '{W}' in a sentence today?","Learning '{W}' will make you more fluent.","'{W}' is a word worth reviewing regularly.","Mastery of '{W}' comes from using it often."].map(s=>s.replace(/\{W\}/g,target.word));
+  fb.forEach(f=>{if(res.length<5&&!used.has(f)){used.add(f);res.push({phrase:f,context:"uso general",tip:ptip(target.phonetic),level:target.level||"B1",wu:[target.word]});}});
+  return res;
+}
+function pwr(v){const bt={};v.forEach(w=>{bt[w.type]=(bt[w.type]||0)+1;});const n=bt.noun||0,a=bt.adjective||0,vb=bt.verb||0;return{total:v.length,combos:Math.min(9999,(n*a)+(n*vb)+(a*vb)+(v.length*3)),pct:Math.min(100,Math.round((v.length/60)*100))};}
+
+// ─── GRAMMAR FORMULAS ─────────────────────────────────────
+const GF=[
+  {group:"🕐 Present",color:"#6366f1",items:[
+    {name:"Present Simple",formula:"S + base verb (+ s/es)",ex:"She works every day.",neg:"She does not work.",q:"Does she work?",use:"Habits, facts, routines",level:"A1"},
+    {name:"Present Continuous",formula:"S + am/is/are + verb-ing",ex:"She is working right now.",neg:"She is not working.",q:"Is she working?",use:"Actions happening now",level:"A1"},
+    {name:"Present Perfect",formula:"S + have/has + past participle",ex:"She has worked here for 5 years.",neg:"She has not worked there.",q:"Has she worked here?",use:"Past with present relevance",level:"B1"},
+    {name:"Present Perfect Cont.",formula:"S + have/has + been + verb-ing",ex:"She has been working all morning.",neg:"She has not been working.",q:"How long has she been working?",use:"Duration of ongoing action",level:"B2"},
+  ]},
+  {group:"⏮ Past",color:"#f59e0b",items:[
+    {name:"Past Simple",formula:"S + past form of verb",ex:"She worked yesterday.",neg:"She did not work.",q:"Did she work?",use:"Completed actions",level:"A1"},
+    {name:"Past Continuous",formula:"S + was/were + verb-ing",ex:"She was working when he called.",neg:"She was not working.",q:"Was she working?",use:"Ongoing or interrupted past actions",level:"A2"},
+    {name:"Past Perfect",formula:"S + had + past participle",ex:"She had already worked when I arrived.",neg:"She had not worked.",q:"Had she worked before?",use:"Action before another past action",level:"B1"},
+    {name:"Past Perfect Cont.",formula:"S + had + been + verb-ing",ex:"She had been working for hours.",neg:"She had not been working.",q:"How long had she been working?",use:"Duration before another past event",level:"B2"},
+  ]},
+  {group:"⏭ Future",color:"#10b981",items:[
+    {name:"Future Simple (will)",formula:"S + will + base verb",ex:"She will work tomorrow.",neg:"She will not work.",q:"Will she work?",use:"Decisions, predictions, promises",level:"A2"},
+    {name:"Going to",formula:"S + am/is/are + going to + base",ex:"She is going to work late.",neg:"She is not going to work.",q:"Is she going to work?",use:"Plans and intentions",level:"A2"},
+    {name:"Future Continuous",formula:"S + will + be + verb-ing",ex:"She will be working at 8pm.",neg:"She will not be working.",q:"Will she be working?",use:"Action in progress at future moment",level:"B2"},
+    {name:"Future Perfect",formula:"S + will + have + past participle",ex:"By Friday, she will have finished.",neg:"She will not have finished.",q:"Will she have finished?",use:"Completed before a future point",level:"C1"},
+    {name:"Future Perfect Cont.",formula:"S + will + have + been + verb-ing",ex:"By June, she will have been working here a year.",neg:"—",q:"How long will she have been working?",use:"Duration before a future point",level:"C2"},
+  ]},
+  {group:"🔀 Conditionals",color:"#a855f7",items:[
+    {name:"Zero Conditional",formula:"If + Present Simple, Present Simple",ex:"If you heat water, it boils.",neg:"—",q:"—",use:"Universal truths, facts",level:"B1"},
+    {name:"First Conditional",formula:"If + Present Simple, will + base",ex:"If she works hard, she will succeed.",neg:"If she doesn't work, she won't.",q:"—",use:"Real, likely future conditions",level:"B1"},
+    {name:"Second Conditional",formula:"If + Past Simple, would + base",ex:"If she worked harder, she would succeed.",neg:"If I were you, I wouldn't do that.",q:"What would you do if…?",use:"Hypothetical present or future",level:"B2"},
+    {name:"Third Conditional",formula:"If + Past Perfect, would have + PP",ex:"If she had worked harder, she would have succeeded.",neg:"If I had known, I wouldn't have done it.",q:"What would have happened if…?",use:"Past hypotheticals, regrets",level:"C1"},
+    {name:"Mixed Conditional",formula:"If + Past Perfect, would + base",ex:"If she had studied medicine, she would be a doctor now.",neg:"—",q:"—",use:"Past condition → present result",level:"C1"},
+  ]},
+  {group:"🔄 Passive",color:"#ef4444",items:[
+    {name:"Passive Present Simple",formula:"S + am/is/are + past participle",ex:"The report is written every week.",neg:"It is not written by hand.",q:"Is it written by hand?",use:"Focus on action, not doer",level:"B1"},
+    {name:"Passive Past Simple",formula:"S + was/were + past participle",ex:"The report was written yesterday.",neg:"It was not written by him.",q:"Was it written by him?",use:"Completed passive actions",level:"B1"},
+    {name:"Passive Present Perfect",formula:"S + have/has + been + PP",ex:"The report has been written.",neg:"It has not been finished.",q:"Has it been submitted?",use:"Result of passive action",level:"B2"},
+    {name:"Passive Future",formula:"S + will + be + past participle",ex:"The report will be written tomorrow.",neg:"It will not be sent today.",q:"Will it be reviewed?",use:"Passive future actions",level:"B2"},
+    {name:"Passive Modal",formula:"S + modal + be + past participle",ex:"The report must be submitted by Friday.",neg:"It shouldn't be delayed.",q:"Can it be extended?",use:"Obligation/possibility passive",level:"C1"},
+  ]},
+  {group:"📣 Reported Speech",color:"#06b6d4",items:[
+    {name:"Reported Statement",formula:"He said (that) + backshifted tense",ex:"She said she was working. (is→was)",neg:"He said he didn't know.",q:"—",use:"Reporting what someone said",level:"B2"},
+    {name:"Reported Question",formula:"He asked + if/wh- + normal order",ex:"She asked where I worked.",neg:"He asked if she wasn't coming.",q:"—",use:"Reporting questions",level:"B2"},
+    {name:"Reported Command",formula:"He told/asked + object + to + inf",ex:"She told me to work faster.",neg:"He asked me not to be late.",q:"—",use:"Reporting orders and requests",level:"B2"},
+    {name:"Tense Backshift",formula:"Present→Past · will→would · can→could",ex:"'I work here' → She said she worked there.",neg:"—",q:"—",use:"Required when reporting past speech",level:"C1"},
+  ]},
+  {group:"🎭 Modals",color:"#f97316",items:[
+    {name:"Can / Could",formula:"S + can/could + base verb",ex:"She can speak French.",neg:"I can't do it.",q:"Can you help?",use:"Ability, possibility, permission",level:"A2"},
+    {name:"Must / Have to",formula:"S + must/have to + base verb",ex:"You must submit it today.",neg:"You don't have to come.",q:"Do I have to attend?",use:"Obligation (must=internal, have to=external)",level:"B1"},
+    {name:"Should / Ought to",formula:"S + should/ought to + base verb",ex:"You should study more.",neg:"You shouldn't waste time.",q:"Should I call him?",use:"Advice, moral obligation",level:"B1"},
+    {name:"Would",formula:"S + would + base verb",ex:"I would help if I could.",neg:"I wouldn't do that.",q:"Would you mind…?",use:"Hypothetical, polite requests",level:"B2"},
+    {name:"May / Might",formula:"S + may/might + base verb",ex:"She may be late. It might rain.",neg:"He might not come.",q:"May I leave early?",use:"Possibility, permission",level:"B1"},
+    {name:"Perfect Modals",formula:"Modal + have + past participle",ex:"She must have left. He could have tried.",neg:"You shouldn't have done that.",q:"Could they have known?",use:"Speculation, regret about the past",level:"C1"},
+  ]},
+  {group:"➡️ Inf & Gerund",color:"#ec4899",items:[
+    {name:"Gerund as Subject",formula:"Verb-ing + predicate",ex:"Learning languages takes time.",neg:"—",q:"—",use:"When the action itself is the topic",level:"B1"},
+    {name:"Verbs + Gerund",formula:"Verb + verb-ing",ex:"She enjoys reading.",neg:"—",q:"—",use:"enjoy, avoid, finish, consider, risk, deny, keep",level:"B1"},
+    {name:"Verbs + Infinitive",formula:"Verb + to + base verb",ex:"She wants to learn.",neg:"—",q:"—",use:"want, hope, plan, decide, agree, refuse, manage",level:"B1"},
+    {name:"Verbs + Both (diff meaning)",formula:"stop/try/remember + gerund vs infinitive",ex:"Stop talking (quit) vs Stop to talk (pause).",neg:"—",q:"—",use:"stop, try, remember, forget, regret, mean",level:"C1"},
+  ]},
+  {group:"🔗 Relative Clauses",color:"#84cc16",items:[
+    {name:"Defining Relative",formula:"Noun + who/which/that + clause",ex:"The book that she wrote is a bestseller.",neg:"—",q:"—",use:"Identifies which one — no commas",level:"B1"},
+    {name:"Non-defining Relative",formula:"Noun, + who/which + clause,",ex:"Her book, which won a prize, is excellent.",neg:"—",q:"—",use:"Extra info — commas required",level:"B2"},
+    {name:"Reduced Relative",formula:"Noun + past participle / present participle",ex:"The report written by her was excellent.",neg:"—",q:"—",use:"Shortened relative clause — formal",level:"C1"},
+  ]},
+  {group:"🌀 Advanced C1-C2",color:"#f59e0b",items:[
+    {name:"Subjunctive",formula:"S + verb (base form, no conjugation)",ex:"It is essential that she be present.",neg:"It is vital that he not miss it.",q:"—",use:"Formal demands, suggestions",level:"C1"},
+    {name:"Inversion",formula:"Auxiliary + Subject + verb",ex:"Never have I seen such dedication.",neg:"Not only did he fail, but he also lied.",q:"—",use:"Emphasis, formal writing",level:"C1"},
+    {name:"Cleft Sentences",formula:"It is/was + emphasis + that/who + clause",ex:"It was her dedication that made the difference.",neg:"—",q:"—",use:"Emphasize specific part of sentence",level:"C1"},
+    {name:"Nominalization",formula:"Verb/adj → noun for formal writing",ex:"They investigated fraud → The fraud investigation.",neg:"—",q:"—",use:"Academic and professional writing",level:"C2"},
+  ]},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// APP
+// ═══════════════════════════════════════════════════════════════
+function App(){
+  const [vocab,setVocab]=useState(()=>loadVocab());
+  const [sr,setSR]=useState(()=>loadSR());
+  const [tab,setTab]=useState("vault");
+  const [toasts,setToasts]=useState([]);
+  const [saved,setSaved]=useState(false);
+  const [showGF,setShowGF]=useState(false);
+
+  const toast=useCallback((msg,t="ok")=>{
+    const id=Date.now()+Math.random();
+    setToasts(p=>[...p,{id,msg,t}]);
+    setTimeout(()=>setToasts(p=>p.filter(x=>x.id!==id)),3500);
+  },[]);
+
+  const persist=useCallback((arr)=>{
+    saveVocab(arr);setVocab(arr);setSaved(true);setTimeout(()=>setSaved(false),2000);
+  },[]);
+
+  const addWord=useCallback((e)=>{
+    setVocab(cur=>{
+      if(cur.find(v=>v.word.toLowerCase()===e.word.toLowerCase())){toast(`"${e.word}" ya existe.`,"w");return cur;}
+      const upd=[{...e,id:Date.now()+Math.random(),addedAt:Date.now()},...cur];
+      persist(upd);toast(`💾 "${e.word}" guardada!`);return upd;
+    });
+  },[toast,persist]);
+
+  const bulkAdd=useCallback((entries)=>{
+    let added=0,skip=0;
+    setVocab(cur=>{
+      const ex=new Set(cur.map(v=>v.word.toLowerCase()));
+      const nn=[];
+      entries.forEach(e=>{
+        if(!e.word)return;
+        if(ex.has(e.word.toLowerCase())){skip++;return;}
+        ex.add(e.word.toLowerCase());
+        nn.push({...e,id:Date.now()+Math.random(),addedAt:Date.now()});
+        added++;
+      });
+      const upd=[...nn,...cur];persist(upd);
+      toast(`💾 ${added} guardadas.${skip?` ${skip} omitidas.`:""}`);return upd;
+    });
+  },[toast,persist]);
+
+  const updateSR=useCallback((wordId,rating)=>{
+    setSR(prev=>{
+      const e=getSREntry(prev,wordId);
+      const{strength,nextReview}=nextReviewDate(e.strength,rating);
+      const upd={...prev,[wordId]:{strength,nextReview,reviews:(e.reviews||0)+1}};
+      saveSR(upd);return upd;
+    });
+  },[]);
+
+  const due=useMemo(()=>getDueWords(vocab,sr),[vocab,sr]);
+  const TABS=[{id:"vault",icon:"📚",label:"Vocabulary"},{id:"quiz",icon:"🧠",label:"Quiz"},{id:"brain",icon:"🔬",label:"Brain Lab"}];
+
+  return html`
+    <div style=${{minHeight:"100vh",background:"radial-gradient(ellipse at 15% 10%,rgba(99,102,241,.1) 0%,transparent 50%),radial-gradient(ellipse at 85% 80%,rgba(139,92,246,.08) 0%,transparent 50%),#060a12"}}>
+      <!-- Header -->
+      <header style=${{position:"sticky",top:0,zIndex:50,backdropFilter:"blur(20px)",background:"rgba(6,10,18,.85)",borderBottom:"1px solid rgba(255,255,255,.06)"}}>
+        <div style=${{maxWidth:"1100px",margin:"0 auto",padding:"0 16px",height:"56px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:"10px"}}>
+          <div style=${{display:"flex",alignItems:"center",gap:"10px"}}>
+            <div style=${{width:"34px",height:"34px",borderRadius:"10px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"17px",boxShadow:"0 0 18px rgba(99,102,241,.5)"}}>🧠</div>
+            <div>
+              <div class="syne" style=${{fontSize:"16px",background:"linear-gradient(135deg,#a5b4fc,#c4b5fd)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>LinguaMind</div>
+              <div style=${{fontSize:"9px",color:"rgba(255,255,255,.3)",letterSpacing:"2px"}}>ENGLISH TRAINER</div>
+            </div>
+          </div>
+          <div style=${{display:"flex",alignItems:"center",gap:"8px",flexWrap:"wrap",justifyContent:"flex-end"}}>
+            ${saved&&html`<div class="pop" style=${{fontSize:"11px",padding:"3px 9px",borderRadius:"20px",background:"rgba(16,185,129,.15)",border:"1px solid rgba(16,185,129,.3)",color:"#6ee7b7"}}>💾 Guardado</div>`}
+            ${due.length>0&&tab!=="brain"&&html`<button onClick=${()=>setTab("brain")} style=${{fontSize:"11px",padding:"3px 9px",borderRadius:"20px",background:"rgba(245,158,11,.15)",border:"1px solid rgba(245,158,11,.3)",color:"#fcd34d",cursor:"pointer"}}>🔔 ${due.length}</button>`}
+            <button class="btn btn-amber" style=${{padding:"5px 11px",fontSize:"11px"}} onClick=${()=>setShowGF(true)}>📐 Fórmulas</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Tabs -->
+      <div style=${{maxWidth:"1100px",margin:"0 auto",padding:"16px 16px 0"}}>
+        <div class="tab-bar">
+          ${TABS.map(t=>html`
+            <button key=${t.id} class=${`tab-btn${tab===t.id?" active":""}`} onClick=${()=>setTab(t.id)}>
+              ${t.icon} <span>${t.label}</span>
+              ${t.id==="brain"&&due.length>0&&html`<span style=${{background:"#ef4444",color:"#fff",borderRadius:"10px",padding:"1px 5px",fontSize:"10px",fontWeight:800}}>${due.length}</span>`}
+            </button>
+          `)}
+        </div>
+      </div>
+
+      <!-- Content -->
+      <main class="pb-safe" style=${{maxWidth:"1100px",margin:"0 auto",padding:"20px 16px 80px"}}>
+        ${tab==="vault"&&html`<${VaultTab} vocab=${vocab} addWord=${addWord} bulkAdd=${bulkAdd} sr=${sr} toast=${toast}/>`}
+        ${tab==="quiz"&&html`<${QuizTab} vocab=${vocab} updateSR=${updateSR}/>`}
+        ${tab==="brain"&&html`<${BrainTab} vocab=${vocab} sr=${sr} updateSR=${updateSR}/>`}
+      </main>
+
+      <!-- Floating grammar button -->
+      <button onClick=${()=>setShowGF(true)}
+        style=${{position:"fixed",bottom:"22px",right:"22px",zIndex:90,width:"50px",height:"50px",borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#f97316)",border:"none",cursor:"pointer",fontSize:"20px",boxShadow:"0 4px 20px rgba(245,158,11,.5)",display:"flex",alignItems:"center",justifyContent:"center"}}
+        title="Fórmulas Gramaticales">📐</button>
+
+      ${showGF&&html`<${GrammarFormulas} onClose=${()=>setShowGF(false)}/>`}
+
+      <!-- Toasts -->
+      <div style=${{position:"fixed",bottom:"20px",left:"50%",transform:"translateX(-50%)",zIndex:100,display:"flex",flexDirection:"column",gap:"7px",alignItems:"center",pointerEvents:"none"}}>
+        ${toasts.map(t=>html`
+          <div key=${t.id} class="toast fadeUp" style=${{background:t.t==="w"?"rgba(245,158,11,.2)":"rgba(16,185,129,.2)",border:t.t==="w"?"1px solid rgba(245,158,11,.4)":"1px solid rgba(16,185,129,.4)",color:t.t==="w"?"#fcd34d":"#6ee7b7"}}>${t.msg}</div>
+        `)}
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VAULT TAB
+// ═══════════════════════════════════════════════════════════════
+function VaultTab({vocab,addWord,bulkAdd,sr,toast}){
+  const [search,setSearch]=useState("");
+  const [cat,setCat]=useState("ALL");
+  const [lvl,setLvl]=useState("ALL");
+  const [showAdd,setShowAdd]=useState(false);
+  const [showBulk,setShowBulk]=useState(false);
+  const [fc,setFc]=useState(null);
+  const [fci,setFci]=useState(0);
+  const [fcf,setFcf]=useState(false);
+  const impRef=useRef(null);
+
+  const filtered=useMemo(()=>vocab.filter(w=>{
+    const s=search.toLowerCase();
+    const ms=!s||w.word.toLowerCase().includes(s)||w.translation.toLowerCase().includes(s)||(w.tags||[]).some(t=>t.includes(s));
+    return ms&&(cat==="ALL"||w.type===cat)&&(lvl==="ALL"||w.level===lvl);
+  }),[vocab,search,cat,lvl]);
+
+  const pw=pwr(vocab);
+
+  const handleExport=()=>{
+    if(!vocab.length){toast("No hay palabras para exportar.","w");return;}
+    const blob=new Blob([JSON.stringify(vocab,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;a.download=`linguamind_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();URL.revokeObjectURL(url);
+    toast(`📤 ${vocab.length} palabras exportadas`);
+  };
+
+  const handleImport=(e)=>{
+    const file=e.target.files?.[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      try{
+        const parsed=JSON.parse(ev.target.result);
+        if(!Array.isArray(parsed))throw new Error("Debe ser un array JSON.");
+        const valid=parsed.filter(w=>w&&typeof w.word==="string"&&w.word.trim());
+        if(!valid.length)throw new Error("No se encontraron palabras.");
+        bulkAdd(valid);
+      }catch(err){toast(`⚠️ Error: ${err.message}`,"w");}
+    };
+    reader.readAsText(file);e.target.value="";
+  };
+
+  return html`
+    <div style=${{display:"flex",flexDirection:"column",gap:"16px"}}>
+
+      <!-- Power bar -->
+      <div class="card" style=${{padding:"13px 16px",background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.07))",border:"1px solid rgba(99,102,241,.2)"}}>
+        <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"7px",flexWrap:"wrap",gap:"8px"}}>
+          <div style=${{display:"flex",alignItems:"center",gap:"7px"}}>
+            <span>⚡</span>
+            <span class="syne" style=${{fontSize:"12px",color:"#a5b4fc"}}>Phrase Engine · ${pw.combos} combos</span>
+          </div>
+          <div style=${{display:"flex",gap:"12px"}}>
+            ${[["📖",vocab.length,"total"],["🔀",pw.combos,"combos"],["👁",filtered.length,"visibles"]].map(([ic,v,l])=>html`
+              <div key=${l} style=${{textAlign:"center"}}>
+                <div style=${{fontSize:"9px",color:"rgba(255,255,255,.3)",textTransform:"uppercase",letterSpacing:"1px"}}>${l}</div>
+                <div class="syne" style=${{fontSize:"14px",color:"#c4b5fd"}}>${v}</div>
+              </div>
+            `)}
+          </div>
+        </div>
+        <div class="sbar"><div class="sbar-fill" style=${{width:`${pw.pct}%`,background:"linear-gradient(90deg,#6366f1,#a78bfa)",boxShadow:"0 0 10px rgba(99,102,241,.5)"}}></div></div>
+      </div>
+
+      <!-- Category pills -->
+      <div style=${{overflowX:"auto",paddingBottom:"3px"}}>
+        <div style=${{display:"flex",gap:"6px",width:"max-content"}}>
+          <button class="pill" onClick=${()=>setCat("ALL")}
+            style=${{background:cat==="ALL"?"rgba(255,255,255,.12)":"transparent",borderColor:cat==="ALL"?"rgba(255,255,255,.3)":"rgba(255,255,255,.1)",color:cat==="ALL"?"#fff":"rgba(255,255,255,.45)"}}>
+            🗂 Todas (${vocab.length})
+          </button>
+          ${Object.entries(CATS).map(([k,c])=>{
+            const count=vocab.filter(w=>w.type===k).length;
+            const active=cat===k;
+            return html`
+              <button key=${k} class="pill" onClick=${()=>setCat(p=>p===k?"ALL":k)}
+                style=${{background:active?c.bg:"transparent",borderColor:active?c.border:"rgba(255,255,255,.09)",color:active?c.color:"rgba(255,255,255,.4)"}}>
+                ${c.icon} ${c.label} ${count>0&&html`<span style=${{background:active?c.border:"rgba(255,255,255,.1)",padding:"0 5px",borderRadius:"10px",fontSize:"10px"}}>${count}</span>`}
+              </button>
+            `;
+          })}
+        </div>
+      </div>
+
+      <!-- Search + controls -->
+      <div style=${{display:"flex",gap:"7px",flexWrap:"wrap"}}>
+        <div style=${{position:"relative",flex:"1",minWidth:"150px"}}>
+          <span style=${{position:"absolute",left:"12px",top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,.25)",fontSize:"14px"}}>🔍</span>
+          <input class="inp" value=${search} onInput=${e=>setSearch(e.target.value)} placeholder="Buscar…"
+            style=${{paddingLeft:"36px",paddingRight:"30px"}}/>
+          ${search&&html`<button onClick=${()=>setSearch("")} style=${{position:"absolute",right:"10px",top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"rgba(255,255,255,.3)",cursor:"pointer",fontSize:"14px"}}>✕</button>`}
+        </div>
+        <select class="inp" value=${lvl} onChange=${e=>setLvl(e.target.value)} style=${{width:"auto",color:"rgba(255,255,255,.7)"}}>
+          ${["ALL","A1","A2","B1","B2","C1","C2"].map(l=>html`<option key=${l} value=${l}>${l==="ALL"?"All":l}</option>`)}
+        </select>
+        <button class="btn btn-ghost" onClick=${()=>fc||setFc(filtered.length?filtered:null)}>🃏 Flash</button>
+        <button class="btn btn-green" onClick=${()=>setShowBulk(true)}>📦 Bulk</button>
+        <input ref=${impRef} type="file" accept=".json" onChange=${handleImport} style=${{display:"none"}}/>
+        <button class="btn btn-cyan" onClick=${()=>impRef.current?.click()}>📥 Importar</button>
+        <button class="btn btn-purple" onClick=${handleExport}>📤 Exportar</button>
+        <button class="btn btn-primary" onClick=${()=>setShowAdd(true)}>+ Añadir</button>
+      </div>
+
+      <!-- Word grid -->
+      ${filtered.length===0
+        ?html`<div style=${{textAlign:"center",padding:"60px 0",color:"rgba(255,255,255,.2)"}}>
+          <div style=${{fontSize:"44px",marginBottom:"10px"}}>📭</div>
+          <div class="syne" style=${{fontSize:"17px"}}>Sin palabras</div>
+          <div style=${{fontSize:"13px",marginTop:"4px"}}>Agrega tu primera palabra o cambia los filtros</div>
+        </div>`
+        :html`<div style=${{display:"grid",gap:"11px",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))"}}>
+          ${filtered.map(w=>html`<${WordCard} key=${w.id} word=${w} allVocab=${vocab} sr=${sr}/>`)}
+        </div>`}
+
+      ${fc&&html`<${FlashcardModal} cards=${fc} idx=${fci} flipped=${fcf}
+        onFlip=${()=>setFcf(f=>!f)}
+        onNext=${()=>{setFcf(false);setTimeout(()=>setFci(i=>Math.min(i+1,fc.length-1)),120);}}
+        onPrev=${()=>{setFcf(false);setTimeout(()=>setFci(i=>Math.max(i-1,0)),120);}}
+        onClose=${()=>{setFc(null);setFci(0);}}/>`}
+      ${showAdd&&html`<${AddWordModal} onClose=${()=>setShowAdd(false)} onAdd=${e=>{addWord(e);setShowAdd(false);}}/>`}
+      ${showBulk&&html`<${BulkModal} onClose=${()=>setShowBulk(false)} onImport=${es=>{bulkAdd(es);setShowBulk(false);}}/>`}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WORD CARD
+// ═══════════════════════════════════════════════════════════════
+function WordCard({word,allVocab,sr}){
+  const [exp,setExp]=useState(false);
+  const [ei,setEi]=useState(0);
+  const [phrases,setPhrases]=useState(null);
+  const [showPh,setShowPh]=useState(false);
+  const cat=CATS[word.type]||CATS.noun;
+  const srE=getSREntry(sr,word.id);
+  const sc=getStrengthColor(srE.strength);
+
+  return html`
+    <div class="card fadeUp" style=${{borderLeft:`3px solid ${cat.color}`}}>
+      <!-- Header -->
+      <div onClick=${()=>setExp(e=>!e)} style=${{padding:"13px 14px",cursor:"pointer",display:"flex",alignItems:"flex-start",gap:"10px",justifyContent:"space-between"}}>
+        <div style=${{flex:1,minWidth:0}}>
+          <div style=${{display:"flex",alignItems:"center",gap:"6px",flexWrap:"wrap",marginBottom:"3px"}}>
+            <span class="syne" style=${{fontSize:"15px",color:"#fff"}}>${word.word}</span>
+            <span style=${{fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"20px",background:cat.bg,color:cat.color,border:`1px solid ${cat.border}`}}>${cat.icon} ${cat.label}</span>
+            ${word.level&&html`<span style=${{fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"20px",background:"rgba(255,255,255,.07)",color:"rgba(255,255,255,.5)"}}>${word.level}</span>`}
+          </div>
+          <div style=${{fontSize:"11px",color:"rgba(255,255,255,.3)",fontFamily:"monospace",marginBottom:"2px"}}>${word.phonetic}</div>
+          <div style=${{fontSize:"13px",fontWeight:600,color:cat.color}}>${word.translation}</div>
+          ${word.type==="irregular_verb"&&word.past&&html`
+            <div style=${{marginTop:"3px",display:"flex",gap:"5px",flexWrap:"wrap"}}>
+              ${["Base:"+word.word,"Past:"+word.past,"PP:"+(word.past_participle||"—")].map(t=>html`
+                <span style=${{fontSize:"10px",padding:"1px 7px",borderRadius:"8px",background:"rgba(239,68,68,.12)",color:"#f87171"}}>${t}</span>
+              `)}
+            </div>
+          `}
+          ${word.type==="connector"&&word.usage&&html`<div style=${{fontSize:"11px",color:"rgba(168,85,247,.7)",marginTop:"2px"}}>Uso: ${word.usage}</div>`}
+          ${word.type==="verbal_phrase"&&word.particle&&html`<div style=${{fontSize:"11px",color:"rgba(6,182,212,.7)",marginTop:"2px"}}>Partícula: <strong>${word.particle}</strong></div>`}
+        </div>
+        <div style=${{display:"flex",gap:"5px",flexShrink:0}} onClick=${e=>e.stopPropagation()}>
+          <button onClick=${()=>speak(word.word)} style=${{width:"28px",height:"28px",borderRadius:"8px",background:cat.bg,border:`1px solid ${cat.border}`,cursor:"pointer",fontSize:"12px",display:"flex",alignItems:"center",justifyContent:"center"}}>🔊</button>
+          <button onClick=${()=>setExp(e=>!e)} style=${{width:"28px",height:"28px",borderRadius:"8px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.07)",cursor:"pointer",color:"rgba(255,255,255,.4)",fontSize:"11px",display:"flex",alignItems:"center",justifyContent:"center"}}>${exp?"▲":"▼"}</button>
+        </div>
+      </div>
+
+      <!-- SR strength bar -->
+      <div style=${{height:"2px",background:"rgba(255,255,255,.04)",margin:"0 14px"}}>
+        <div style=${{height:"2px",borderRadius:"2px",width:`${(srE.strength/5)*100}%`,background:sc,transition:"width .5s"}}></div>
+      </div>
+
+      <!-- Expanded -->
+      ${exp&&html`
+        <div style=${{padding:"11px 14px 14px",borderTop:"1px solid rgba(255,255,255,.04)",marginTop:"4px",display:"flex",flexDirection:"column",gap:"10px"}}>
+          ${word.definition&&html`
+            <div>
+              <div style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.25)",marginBottom:"3px"}}>Definición</div>
+              <div style=${{fontSize:"13px",color:"rgba(255,255,255,.7)",lineHeight:1.6}}>${word.definition}</div>
+            </div>
+          `}
+          ${word.examples?.length>0&&html`
+            <div style=${{borderRadius:"12px",padding:"10px",background:cat.bg,border:`1px solid ${cat.border}`}}>
+              <div style=${{display:"flex",alignItems:"flex-start",gap:"7px"}}>
+                <div style=${{flex:1}}>
+                  <div style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:cat.color,opacity:.7,marginBottom:"3px"}}>Ejemplo ${ei+1}/${word.examples.length}</div>
+                  <div style=${{fontSize:"12px",fontStyle:"italic",color:"rgba(255,255,255,.8)",lineHeight:1.6}}>"${word.examples[ei]}"</div>
+                </div>
+                <button onClick=${()=>speak(word.examples[ei])} style=${{width:"26px",height:"26px",borderRadius:"7px",background:"rgba(255,255,255,.1)",border:"none",cursor:"pointer",fontSize:"11px",flexShrink:0}}>🔊</button>
+              </div>
+              ${word.examples.length>1&&html`
+                <div style=${{display:"flex",gap:"4px",marginTop:"6px"}}>
+                  ${word.examples.map((_,i)=>html`<button key=${i} onClick=${()=>setEi(i)} style=${{height:"3px",borderRadius:"3px",border:"none",cursor:"pointer",transition:"all .2s",width:i===ei?"14px":"5px",background:i===ei?cat.color:"rgba(255,255,255,.2)"}}></button>`)}
+                </div>
+              `}
+            </div>
+          `}
+          ${word.tags?.length>0&&html`
+            <div style=${{display:"flex",flexWrap:"wrap",gap:"5px"}}>
+              ${word.tags.map(t=>html`<span key=${t} style=${{fontSize:"11px",padding:"2px 8px",borderRadius:"20px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",color:"rgba(255,255,255,.38)"}}>#${t}</span>`)}
+            </div>
+          `}
+
+          <!-- Phrase builder -->
+          <div style=${{display:"flex",gap:"7px"}}>
+            <button onClick=${()=>{if(showPh&&phrases){setShowPh(false);return;}setPhrases(buildPhrases(word,allVocab));setShowPh(true);}}
+              style=${{flex:1,padding:"8px",borderRadius:"12px",background:showPh?"rgba(234,179,8,.1)":"linear-gradient(135deg,rgba(234,179,8,.18),rgba(251,146,60,.15))",border:"1px solid rgba(234,179,8,.3)",color:"#fde047",fontSize:"12px",fontWeight:700,cursor:"pointer"}}>
+              💬 ${showPh?"Ocultar frases":"Generar frases de conversación"}
+            </button>
+            ${showPh&&phrases&&html`
+              <button onClick=${()=>setPhrases(buildPhrases(word,allVocab))}
+                style=${{padding:"8px 11px",borderRadius:"12px",background:"rgba(234,179,8,.1)",border:"1px solid rgba(234,179,8,.2)",color:"rgba(253,224,71,.6)",cursor:"pointer",fontSize:"14px"}}>🔄</button>
+            `}
+          </div>
+
+          ${showPh&&phrases&&html`
+            <div style=${{display:"flex",flexDirection:"column",gap:"7px"}}>
+              ${phrases.map((p,i)=>html`
+                <div key=${i} style=${{borderRadius:"11px",padding:"10px",background:"rgba(234,179,8,.05)",border:"1px solid rgba(234,179,8,.15)",display:"flex",flexDirection:"column",gap:"5px"}}>
+                  <div style=${{display:"flex",alignItems:"flex-start",gap:"7px"}}>
+                    <div style=${{flex:1,fontSize:"12px",fontWeight:600,color:"#fff",lineHeight:1.6}}>${p.phrase}</div>
+                    <button onClick=${()=>speak(p.phrase,"en")} style=${{width:"24px",height:"24px",borderRadius:"6px",background:"rgba(234,179,8,.2)",border:"none",cursor:"pointer",color:"#fde047",fontSize:"11px",flexShrink:0}}>🔊</button>
+                  </div>
+                  <div style=${{fontSize:"10px",color:"rgba(253,224,71,.5)"}}>📍 ${p.context}</div>
+                  ${p.tip&&html`<div style=${{fontSize:"10px",color:"rgba(253,224,71,.45)",fontFamily:"monospace"}}>🎯 ${p.tip}</div>`}
+                </div>
+              `)}
+            </div>
+          `}
+
+          <div style=${{fontSize:"10px",color:"rgba(255,255,255,.2)",display:"flex",gap:"10px"}}>
+            <span>💪 Fuerza: ${srE.strength}/5</span>
+            <span>📊 Repasos: ${srE.reviews||0}</span>
+            ${srE.nextReview>0&&html`<span>📅 ${srE.nextReview<=Date.now()?"¡Hoy!":new Date(srE.nextReview).toLocaleDateString("es")}</span>`}
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADD WORD MODAL
+// ═══════════════════════════════════════════════════════════════
+function AddWordModal({onClose,onAdd}){
+  const [f,setF]=useState({word:"",phonetic:"",type:"noun",translation:"",definition:"",ex1:"",ex2:"",level:"B1",tags:"",past:"",pp:"",particle:"",usage:""});
+  const [suggestion,setSuggestion]=useState(null);
+  const [conf,setConf]=useState(0);
+  const [corrected,setCorrected]=useState(false);
+  const sf=k=>e=>setF(v=>({...v,[k]:e.target.value}));
+  const cat=CATS[f.type]||CATS.noun;
+
+  const handleWord=(e)=>{
+    const w=e.target.value;setF(v=>({...v,word:w}));setCorrected(false);
+    if(w.trim().length>=2){
+      const sg=autoClassify(w.trim());
+      if(sg&&sg!==f.type){setSuggestion(sg);setConf(classifyConf(w.trim(),sg));}
+      else setSuggestion(null);
+    }else setSuggestion(null);
+  };
+
+  const apply=()=>{if(!suggestion)return;setF(v=>({...v,type:suggestion}));setSuggestion(null);setCorrected(true);setTimeout(()=>setCorrected(false),2500);};
+
+  const handleAdd=()=>{
+    if(!f.word.trim()||!f.translation.trim())return;
+    const entry={word:f.word.trim(),phonetic:f.phonetic.trim()||`/${f.word}/`,type:f.type,translation:f.translation.trim(),definition:f.definition.trim(),examples:[f.ex1,f.ex2].filter(e=>e.trim()),level:f.level,tags:f.tags.split(",").map(t=>t.trim().toLowerCase()).filter(Boolean)};
+    if(f.type==="irregular_verb"){entry.past=f.past.trim();entry.past_participle=f.pp.trim();}
+    if(f.type==="verbal_phrase")entry.particle=f.particle.trim();
+    if(f.type==="connector")entry.usage=f.usage.trim();
+    onAdd(entry);
+  };
+
+  const detCat=suggestion?CATS[suggestion]:null;
+
+  return html`
+    <div class="overlay">
+      <div class="modal" style=${{maxWidth:"530px",maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
+        <div style=${{padding:"15px 20px",borderBottom:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"space-between",background:`linear-gradient(135deg,${cat.bg},transparent)`,flexShrink:0}}>
+          <div>
+            <div class="syne" style=${{fontSize:"16px",color:"#fff"}}>Añadir palabra</div>
+            <div style=${{fontSize:"11px",color:"rgba(255,255,255,.35)",marginTop:"1px"}}>Clasificación automática · Guardado instantáneo</div>
+          </div>
+          <button onClick=${onClose} style=${{width:"28px",height:"28px",borderRadius:"50%",background:"rgba(255,255,255,.07)",border:"none",cursor:"pointer",color:"rgba(255,255,255,.5)",fontSize:"13px"}}>✕</button>
+        </div>
+
+        <div style=${{padding:"13px 20px 16px",display:"flex",flexDirection:"column",gap:"11px",overflowY:"auto",flex:1}}>
+          <!-- Word input -->
+          <div>
+            <label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Palabra en inglés *</label>
+            <div style=${{position:"relative"}}>
+              <input class="inp" value=${f.word} onInput=${handleWord} placeholder="e.g. perseverance, give up, however…" style=${{paddingRight:"90px"}}/>
+              ${suggestion&&html`
+                <span style=${{position:"absolute",right:"9px",top:"50%",transform:"translateY(-50%)",fontSize:"10px",padding:"2px 7px",borderRadius:"20px",background:(CATS[suggestion]||CATS.noun).bg,color:(CATS[suggestion]||CATS.noun).color,border:`1px solid ${(CATS[suggestion]||CATS.noun).border}`,fontWeight:700,whiteSpace:"nowrap"}}>
+                  ${(CATS[suggestion]||CATS.noun).icon} ${conf}%
+                </span>
+              `}
+            </div>
+            ${suggestion&&detCat&&html`
+              <div class="fadeUp" style=${{marginTop:"7px",borderRadius:"11px",padding:"9px 12px",background:detCat.bg,border:`1px solid ${detCat.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:"9px"}}>
+                <div style=${{fontSize:"12px",color:detCat.color,flex:1}}>
+                  🤖 Detectado: parece un <strong>${detCat.icon} ${detCat.label}</strong> (${conf}%)
+                </div>
+                <button onClick=${apply} style=${{padding:"4px 11px",borderRadius:"20px",background:detCat.color,border:"none",color:"#fff",fontSize:"11px",fontWeight:700,cursor:"pointer",flexShrink:0}}>Aplicar ✓</button>
+              </div>
+            `}
+            ${corrected&&html`<div class="pop" style=${{fontSize:"12px",color:"#6ee7b7",marginTop:"5px"}}>✅ Tipo corregido a ${CATS[f.type]?.label}</div>`}
+          </div>
+
+          <!-- Category pills -->
+          <div>
+            <label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"5px"}}>Tipo gramatical</label>
+            <div style=${{overflowX:"auto",paddingBottom:"2px"}}>
+              <div style=${{display:"flex",gap:"5px",width:"max-content"}}>
+                ${Object.entries(CATS).map(([k,c])=>html`
+                  <button key=${k} class="pill" onClick=${()=>{setF(v=>({...v,type:k}));setSuggestion(null);}}
+                    style=${{background:f.type===k?c.bg:"transparent",borderColor:f.type===k?c.border:"rgba(255,255,255,.08)",color:f.type===k?c.color:"rgba(255,255,255,.3)",fontSize:"11px",padding:"5px 10px"}}>
+                    ${c.icon} ${c.label}
+                  </button>
+                `)}
+              </div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div><label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Traducción *</label><input class="inp" value=${f.translation} onInput=${sf("translation")} placeholder="e.g. Perseverancia"/></div>
+            <div><label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Fonética</label><input class="inp" value=${f.phonetic} onInput=${sf("phonetic")} placeholder="/ˌpɜː.sɪˈvɪər.əns/"/></div>
+          </div>
+          <div class="grid2">
+            <div><label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Nivel</label>
+              <select class="inp" value=${f.level} onChange=${sf("level")}>
+                ${["A1","A2","B1","B2","C1","C2"].map(l=>html`<option key=${l} value=${l}>${l}</option>`)}
+              </select>
+            </div>
+            <div><label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Tags</label><input class="inp" value=${f.tags} onInput=${sf("tags")} placeholder="daily, work…"/></div>
+          </div>
+
+          ${f.type==="irregular_verb"&&html`
+            <div class="fadeUp" style=${{borderRadius:"12px",padding:"11px",background:"rgba(239,68,68,.08)",border:"1px solid rgba(239,68,68,.2)"}}>
+              <div style=${{fontSize:"11px",color:"#f87171",fontWeight:700,marginBottom:"7px"}}>🔄 Formas irregulares</div>
+              <div class="grid2">
+                <div><label style=${{fontSize:"10px",color:"rgba(248,113,113,.6)",display:"block",marginBottom:"3px"}}>Past Simple</label><input class="inp" value=${f.past} onInput=${sf("past")} placeholder="e.g. went"/></div>
+                <div><label style=${{fontSize:"10px",color:"rgba(248,113,113,.6)",display:"block",marginBottom:"3px"}}>Past Participle</label><input class="inp" value=${f.pp} onInput=${sf("pp")} placeholder="e.g. gone"/></div>
+              </div>
+            </div>
+          `}
+          ${f.type==="connector"&&html`
+            <div class="fadeUp" style=${{borderRadius:"12px",padding:"11px",background:"rgba(168,85,247,.08)",border:"1px solid rgba(168,85,247,.2)"}}>
+              <div style=${{fontSize:"11px",color:"#c084fc",fontWeight:700,marginBottom:"6px"}}>🔗 Función</div>
+              <input class="inp" value=${f.usage} onInput=${sf("usage")} placeholder="contrast, addition, result…"/>
+            </div>
+          `}
+          ${f.type==="verbal_phrase"&&html`
+            <div class="fadeUp" style=${{borderRadius:"12px",padding:"11px",background:"rgba(6,182,212,.08)",border:"1px solid rgba(6,182,212,.2)"}}>
+              <div style=${{fontSize:"11px",color:"#22d3ee",fontWeight:700,marginBottom:"6px"}}>💬 Partícula</div>
+              <input class="inp" value=${f.particle} onInput=${sf("particle")} placeholder="up, out, in, away…"/>
+            </div>
+          `}
+
+          <div><label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Definición</label><textarea class="inp" rows="2" style=${{resize:"none",lineHeight:1.6}} placeholder="Meaning in English…" onInput=${sf("definition")}>${f.definition}</textarea></div>
+          <div class="grid2">
+            <div><label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Ejemplo 1</label><input class="inp" value=${f.ex1} onInput=${sf("ex1")} placeholder="Use it in a sentence…"/></div>
+            <div><label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.35)",display:"block",marginBottom:"4px"}}>Ejemplo 2</label><input class="inp" value=${f.ex2} onInput=${sf("ex2")} placeholder="Optional…"/></div>
+          </div>
+        </div>
+
+        <div style=${{padding:"12px 20px",borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",gap:"8px",flexShrink:0}}>
+          <button class="btn btn-ghost" style=${{flex:1}} onClick=${onClose}>Cancelar</button>
+          <button style=${{flex:2,padding:"10px",borderRadius:"13px",background:f.word.trim()&&f.translation.trim()?`linear-gradient(135deg,${cat.color},#7c3aed)`:"rgba(99,102,241,.2)",border:"none",color:f.word.trim()&&f.translation.trim()?"#fff":"rgba(255,255,255,.3)",fontSize:"13px",fontWeight:700,cursor:f.word.trim()&&f.translation.trim()?"pointer":"default"}} onClick=${handleAdd}>
+            ${cat.icon} Guardar como ${cat.label}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BULK MODAL
+// ═══════════════════════════════════════════════════════════════
+function BulkModal({onClose,onImport}){
+  const [text,setText]=useState("");
+  const [preview,setPreview]=useState(null);
+  const [err,setErr]=useState("");
+  const [step,setStep]=useState("paste");
+
+  const validate=()=>{
+    setErr("");
+    try{
+      const raw=text.trim();if(!raw){setErr("Campo vacío.");return;}
+      const p=JSON.parse(raw);if(!Array.isArray(p)){setErr("Debe ser un array [].");return;}
+      if(!p.length){setErr("Array vacío.");return;}
+      const v=p.map((item,i)=>{
+        if(!item.word)throw new Error(`Ítem ${i+1} sin "word"`);
+        return{word:String(item.word).trim(),phonetic:item.phonetic||`/${item.word}/`,type:item.type||"noun",translation:item.translation||"",definition:item.definition||"",examples:Array.isArray(item.examples)?item.examples:(item.examples?[String(item.examples)]:[]),level:item.level||"B1",tags:Array.isArray(item.tags)?item.tags:(item.tags?String(item.tags).split(",").map(t=>t.trim()):[]),past:item.past||"",past_participle:item.past_participle||"",particle:item.particle||"",usage:item.usage||""};
+      });
+      setPreview(v);setStep("preview");
+    }catch(e){setErr(`JSON inválido: ${e.message}`);}
+  };
+
+  return html`
+    <div class="overlay">
+      <div class="modal" style=${{maxWidth:"600px",maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
+        <div style=${{padding:"15px 20px",borderBottom:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <div>
+            <div class="syne" style=${{fontSize:"16px",color:"#fff",display:"flex",alignItems:"center",gap:"8px"}}>
+              📦 Bulk Import
+              <span style=${{fontSize:"11px",padding:"2px 8px",borderRadius:"20px",background:"rgba(16,185,129,.15)",border:"1px solid rgba(16,185,129,.3)",color:"#6ee7b7"}}>500+</span>
+            </div>
+            <div style=${{fontSize:"11px",color:"rgba(255,255,255,.3)",marginTop:"2px"}}>JSON array · Guardado automático · Duplicados omitidos</div>
+          </div>
+          <button onClick=${onClose} style=${{width:"28px",height:"28px",borderRadius:"50%",background:"rgba(255,255,255,.07)",border:"none",cursor:"pointer",color:"rgba(255,255,255,.5)",fontSize:"13px"}}>✕</button>
+        </div>
+        ${step==="paste"&&html`
+          <div style=${{padding:"15px 20px",display:"flex",flexDirection:"column",gap:"13px",overflowY:"auto",flex:1}}>
+            <div style=${{borderRadius:"12px",padding:"11px",background:"rgba(99,102,241,.1)",border:"1px solid rgba(99,102,241,.2)"}}>
+              <div style=${{fontSize:"10px",fontWeight:700,color:"#a5b4fc",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:"6px"}}>Prompt IA para generar palabras</div>
+              <div style=${{borderRadius:"8px",padding:"9px",background:"rgba(0,0,0,.4)",fontSize:"11px",fontFamily:"monospace",color:"rgba(196,181,253,.65)",lineHeight:1.7}}>"Dame 100 palabras inglés nivel B2 en JSON array: word, phonetic, type, translation, definition, examples (array 2), level, tags (array). Solo JSON."</div>
+            </div>
+            <div>
+              <label style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.3)",display:"block",marginBottom:"5px"}}>Pega tu JSON aquí</label>
+              <textarea class="inp" rows="12" style=${{resize:"none",fontFamily:"monospace",fontSize:"12px",lineHeight:1.6}} placeholder='[{"word":"Ambitious","translation":"Ambicioso","type":"adjective","level":"B2"}]' onInput=${e=>setText(e.target.value)}>${text}</textarea>
+            </div>
+            ${err&&html`<div style=${{borderRadius:"11px",padding:"9px 13px",background:"rgba(239,68,68,.12)",border:"1px solid rgba(239,68,68,.3)",color:"#fca5a5",fontSize:"13px"}}>⚠️ ${err}</div>`}
+          </div>
+          <div style=${{padding:"12px 20px",borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",gap:"8px",flexShrink:0}}>
+            <button class="btn btn-ghost" style=${{flex:1}} onClick=${onClose}>Cancelar</button>
+            <button style=${{flex:2,padding:"10px",borderRadius:"13px",background:"linear-gradient(135deg,#059669,#0d9488)",border:"none",color:"#fff",fontSize:"13px",fontWeight:700,cursor:text.trim()?"pointer":"default",opacity:text.trim()?1:.4}} onClick=${validate}>Validar →</button>
+          </div>
+        `}
+        ${step==="preview"&&preview&&html`
+          <div style=${{padding:"15px 20px",display:"flex",flexDirection:"column",gap:"12px",overflowY:"auto",flex:1}}>
+            <div style=${{borderRadius:"12px",padding:"12px 14px",background:"rgba(16,185,129,.1)",border:"1px solid rgba(16,185,129,.2)",display:"flex",alignItems:"center",gap:"10px"}}>
+              <span style=${{fontSize:"24px"}}>✅</span>
+              <div><div style=${{fontWeight:700,color:"#6ee7b7",fontSize:"14px"}}>${preview.length} palabras validadas</div><div style=${{fontSize:"11px",color:"rgba(255,255,255,.4)",marginTop:"1px"}}>Vista previa (primeras 12):</div></div>
+            </div>
+            <div style=${{borderRadius:"12px",overflow:"hidden",border:"1px solid rgba(255,255,255,.08)"}}>
+              <table style=${{width:"100%",borderCollapse:"collapse",fontSize:"12px"}}>
+                <thead><tr style=${{background:"rgba(255,255,255,.04)",color:"rgba(255,255,255,.4)",textTransform:"uppercase",fontSize:"9px",letterSpacing:"1px",textAlign:"left"}}>
+                  <th style=${{padding:"8px 10px"}}>#</th><th style=${{padding:"8px 10px"}}>Palabra</th><th style=${{padding:"8px 10px"}}>Traducción</th><th style=${{padding:"8px 10px"}}>Tipo</th>
+                </tr></thead>
+                <tbody>
+                  ${preview.slice(0,12).map((w,i)=>{const c=CATS[w.type]||CATS.noun;return html`
+                    <tr key=${i} style=${{borderTop:"1px solid rgba(255,255,255,.05)"}}>
+                      <td style=${{padding:"7px 10px",color:"rgba(255,255,255,.25)"}}>${i+1}</td>
+                      <td style=${{padding:"7px 10px",fontWeight:700,color:"#fff"}}>${w.word}</td>
+                      <td style=${{padding:"7px 10px",color:"#a5b4fc"}}>${w.translation||"—"}</td>
+                      <td style=${{padding:"7px 10px"}}><span style=${{fontSize:"10px",padding:"1px 7px",borderRadius:"20px",background:c.bg,color:c.color,fontWeight:700}}>${c.icon} ${c.label}</span></td>
+                    </tr>
+                  `;})}
+                </tbody>
+              </table>
+              ${preview.length>12&&html`<div style=${{padding:"7px 10px",fontSize:"12px",color:"rgba(255,255,255,.3)",textAlign:"center",borderTop:"1px solid rgba(255,255,255,.05)"}}>… y ${preview.length-12} más</div>`}
+            </div>
+          </div>
+          <div style=${{padding:"12px 20px",borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",gap:"8px",flexShrink:0}}>
+            <button class="btn btn-ghost" style=${{flex:1}} onClick=${()=>{setStep("paste");setPreview(null);}}>← Editar</button>
+            <button style=${{flex:2,padding:"10px",borderRadius:"13px",background:"linear-gradient(135deg,#059669,#0d9488)",border:"none",color:"#fff",fontSize:"13px",fontWeight:700,cursor:"pointer"}} onClick=${()=>onImport(preview)}>💾 Guardar ${preview.length} palabras</button>
+          </div>
+        `}
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FLASHCARD MODAL
+// ═══════════════════════════════════════════════════════════════
+function FlashcardModal({cards,idx,flipped,onFlip,onNext,onPrev,onClose}){
+  const card=cards[idx];if(!card)return null;
+  const cat=CATS[card.type]||CATS.noun;
+  return html`
+    <div class="overlay">
+      <div style=${{width:"100%",maxWidth:"400px"}}>
+        <div style=${{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"13px"}}>
+          <span style=${{fontSize:"13px",color:"rgba(255,255,255,.4)"}}>Card ${idx+1}/${cards.length}</span>
+          <button onClick=${onClose} style=${{width:"28px",height:"28px",borderRadius:"50%",background:"rgba(255,255,255,.1)",border:"none",cursor:"pointer",color:"rgba(255,255,255,.6)",fontSize:"13px"}}>✕</button>
+        </div>
+        <div class="sbar" style=${{marginBottom:"16px"}}><div class="sbar-fill" style=${{width:`${((idx+1)/cards.length)*100}%`,background:`linear-gradient(90deg,${cat.color},#8b5cf6)`}}></div></div>
+        <div class="flip-card" style=${{height:"220px"}} onClick=${onFlip}>
+          <div class=${`flip-inner${flipped?" flipped":""}`}>
+            <div class="flip-f" style=${{background:`linear-gradient(135deg,${cat.bg},rgba(15,20,40,.9))`,border:`1px solid ${cat.border}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"10px",padding:"20px",textAlign:"center"}}>
+              <span style=${{fontSize:"10px",color:cat.color,textTransform:"uppercase",letterSpacing:"2px"}}>${cat.icon} ${cat.label}</span>
+              <div class="syne" style=${{fontSize:"30px",color:"#fff"}}>${card.word}</div>
+              <div style=${{fontSize:"12px",color:"rgba(255,255,255,.35)",fontFamily:"monospace"}}>${card.phonetic}</div>
+              <button onClick=${e=>{e.stopPropagation();speak(card.word);}} style=${{width:"34px",height:"34px",borderRadius:"10px",background:cat.bg,border:`1px solid ${cat.border}`,cursor:"pointer",fontSize:"15px"}}>🔊</button>
+              <div class="pulse" style=${{fontSize:"11px",color:"rgba(255,255,255,.25)"}}>Toca para revelar</div>
+            </div>
+            <div class="flip-b" style=${{background:"linear-gradient(135deg,rgba(109,40,217,.8),rgba(157,23,77,.6))",border:"1px solid rgba(139,92,246,.3)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"8px",padding:"20px",textAlign:"center"}}>
+              <div class="syne" style=${{fontSize:"22px",color:"#c4b5fd"}}>${card.translation}</div>
+              ${card.type==="irregular_verb"&&card.past&&html`<div style=${{fontSize:"12px",color:"rgba(248,113,113,.8)"}}>${card.word} · ${card.past} · ${card.past_participle}</div>`}
+              <div style=${{fontSize:"12px",color:"rgba(255,255,255,.55)",lineHeight:1.6}}>${card.definition}</div>
+              ${card.examples?.[0]&&html`<div style=${{fontSize:"11px",color:"rgba(255,255,255,.35)",fontStyle:"italic"}}>"${card.examples[0]}"</div>`}
+            </div>
+          </div>
+        </div>
+        <div style=${{display:"flex",gap:"8px",marginTop:"13px",justifyContent:"center"}}>
+          <button class="btn btn-ghost" disabled=${idx===0} onClick=${onPrev} style=${{opacity:idx===0?.3:1}}>← Prev</button>
+          <button class="btn btn-primary" onClick=${onFlip}>${flipped?"Ocultar":"Revelar"}</button>
+          <button class="btn btn-ghost" disabled=${idx===cards.length-1} onClick=${onNext} style=${{opacity:idx===cards.length-1?.3:1}}>Next →</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// QUIZ TAB
+// ═══════════════════════════════════════════════════════════════
+function QuizTab({vocab,updateSR}){
+  const [mode,setMode]=useState(null);
+  const [qIdx,setQIdx]=useState(0);
+  const [score,setScore]=useState(0);
+  const [sel,setSel]=useState(null);
+  const [shown,setShown]=useState(false);
+  const [done,setDone]=useState(false);
+  const [timer,setTimer]=useState(15);
+  const [tActive,setTActive]=useState(false);
+  const [fill,setFill]=useState("");
+  const [opts,setOpts]=useState([]);
+  const [mp,setMp]=useState(null);
+  const [mSel,setMSel]=useState(null);
+  const [mDone,setMDone]=useState([]);
+  const [mErr,setMErr]=useState([]);
+  const tRef=useRef(null);
+  const wRef=useRef([]);const iRef=useRef(0);const sRef=useRef(0);const shRef=useRef(false);
+  const sh=a=>[...a].sort(()=>Math.random()-.5);
+  const mkOpts=(w,all)=>sh([w.translation,...sh(all.filter(x=>x.id!==w.id)).slice(0,3).map(x=>x.translation||x.word)]);
+
+  const start=(m)=>{
+    if(vocab.length<4){alert("Necesitas al menos 4 palabras.");return;}
+    clearInterval(tRef.current);
+    const pool=sh(vocab).slice(0,Math.min(10,vocab.length));
+    wRef.current=pool;iRef.current=0;sRef.current=0;shRef.current=false;
+    setMode(m);setQIdx(0);setScore(0);setSel(null);setShown(false);setDone(false);setFill("");
+    if(m==="match"){
+      const pairs=sh(vocab).slice(0,Math.min(8,vocab.length));
+      setMp({L:sh(pairs.map((w,i)=>({id:i,text:w.word,pid:i,side:"w"}))),R:sh(pairs.map((w,i)=>({id:i+100,text:w.translation||w.word,pid:i,side:"t"})))});
+      setMSel(null);setMDone([]);setMErr([]);
+    }else{if(m==="mc")setOpts(mkOpts(pool[0],vocab));setTimer(15);setTActive(true);}
+  };
+
+  useEffect(()=>{
+    if(!tActive)return;
+    clearInterval(tRef.current);
+    tRef.current=setInterval(()=>setTimer(t=>{
+      if(t<=1){clearInterval(tRef.current);if(!shRef.current){shRef.current=true;setSel("__to__");setShown(true);setTActive(false);}return 15;}
+      return t-1;
+    }),1000);
+    return()=>clearInterval(tRef.current);
+  },[tActive]);
+
+  const answer=(ans)=>{
+    if(shRef.current)return;
+    clearInterval(tRef.current);setTActive(false);shRef.current=true;
+    const w=wRef.current[iRef.current];
+    const ok=ans&&ans.toLowerCase().trim()===w?.translation?.toLowerCase().trim();
+    if(ok){sRef.current++;setScore(sRef.current);}
+    setSel(ans||"__to__");setShown(true);
+    if(ok)speak(w?.word);
+    if(w)updateSR(w.id,ok?"easy":"hard");
+  };
+
+  const nxt=()=>{
+    const nx=iRef.current+1;
+    if(nx>=wRef.current.length){setDone(true);setTActive(false);updateStreak();return;}
+    iRef.current=nx;shRef.current=false;
+    setQIdx(nx);setSel(null);setShown(false);setFill("");
+    if(mode==="mc")setOpts(mkOpts(wRef.current[nx],vocab));
+    setTimer(15);setTActive(true);
+  };
+
+  const mClick=(item)=>{
+    if(mDone.includes(item.pid))return;
+    if(!mSel){setMSel(item);return;}
+    if(mSel.id===item.id){setMSel(null);return;}
+    if(mSel.pid===item.pid&&mSel.side!==item.side){
+      setMDone(d=>[...d,item.pid]);
+      speak(mp.L.find(x=>x.pid===item.pid)?.text||"");
+      const w=vocab.find(x=>x.word===mp.L.find(y=>y.pid===item.pid)?.text);
+      if(w)updateSR(w.id,"ok");
+      setMSel(null);
+    }else{
+      setMErr(e=>[...e,mSel.id,item.id]);
+      setTimeout(()=>setMErr(e=>e.filter(x=>x!==mSel.id&&x!==item.id)),700);
+      setMSel(null);
+    }
+  };
+
+  const tPct=(timer/15)*100;
+  const tC=timer>8?"#34d399":timer>4?"#fbbf24":"#f87171";
+
+  if(!mode)return html`
+    <div style=${{display:"flex",flexDirection:"column",gap:"16px"}}>
+      <div class="card" style=${{padding:"24px",background:"linear-gradient(135deg,rgba(109,40,217,.3),rgba(79,70,229,.25))",border:"1px solid rgba(99,102,241,.2)"}}>
+        <div style=${{fontSize:"32px",marginBottom:"8px"}}>🧠</div>
+        <div class="syne" style=${{fontSize:"20px",color:"#fff"}}>Quiz Time</div>
+        <div style=${{fontSize:"13px",color:"rgba(255,255,255,.55)",marginTop:"5px"}}>${vocab.length} palabras · El resultado actualiza tu progreso</div>
+      </div>
+      <div style=${{display:"grid",gap:"12px",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))"}}>
+        ${[
+          {id:"mc",icon:"🎯",title:"Multiple Choice",desc:"4 opciones · 15 seg · temporizador",grad:"rgba(79,70,229,.12)",border:"rgba(79,70,229,.25)",btn:"linear-gradient(135deg,#4f46e5,#6366f1)"},
+          {id:"fill",icon:"✏️",title:"Fill in the Blank",desc:"Escribe la traducción · Active Recall",grad:"rgba(109,40,217,.12)",border:"rgba(109,40,217,.25)",btn:"linear-gradient(135deg,#7c3aed,#8b5cf6)"},
+          {id:"match",icon:"🔗",title:"Match Pairs",desc:"Conecta palabras con traducciones",grad:"rgba(5,150,105,.1)",border:"rgba(16,185,129,.2)",btn:"linear-gradient(135deg,#059669,#0d9488)"},
+        ].map(m=>html`
+          <div key=${m.id} class="card" style=${{padding:"20px",background:m.grad,border:`1px solid ${m.border}`,display:"flex",flexDirection:"column",gap:"13px"}}>
+            <span style=${{fontSize:"28px"}}>${m.icon}</span>
+            <div><div class="syne" style=${{fontSize:"15px",color:"#fff"}}>${m.title}</div><div style=${{fontSize:"12px",color:"rgba(255,255,255,.5)",marginTop:"4px"}}>${m.desc}</div></div>
+            <button style=${{padding:"10px",borderRadius:"12px",background:m.btn,border:"none",color:"#fff",fontSize:"13px",fontWeight:700,cursor:"pointer"}} onClick=${()=>start(m.id)}>Comenzar →</button>
+          </div>
+        `)}
+      </div>
+    </div>
+  `;
+
+  if(mode==="match"){
+    const mf=mp?.L&&mDone.length===mp.L.length;
+    return html`
+      <div style=${{display:"flex",flexDirection:"column",gap:"13px"}}>
+        <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div><div class="syne" style=${{fontSize:"18px",color:"#fff"}}>🔗 Match Pairs</div><div style=${{fontSize:"12px",color:"rgba(255,255,255,.4)",marginTop:"2px"}}>${mDone.length}/${mp?.L?.length||0} emparejadas</div></div>
+          <button class="btn btn-ghost" onClick=${()=>setMode(null)}>← Menú</button>
+        </div>
+        ${mf?html`
+          <div class="card" style=${{padding:"40px",textAlign:"center",background:"linear-gradient(135deg,rgba(5,150,105,.3),rgba(13,148,136,.2))",border:"1px solid rgba(16,185,129,.25)"}}>
+            <div style=${{fontSize:"48px",marginBottom:"10px"}}>🎉</div>
+            <div class="syne" style=${{fontSize:"20px",color:"#6ee7b7"}}>¡Perfecto!</div>
+            <button class="btn" style=${{marginTop:"16px",background:"linear-gradient(135deg,#059669,#0d9488)"}} onClick=${()=>start("match")}>Jugar de nuevo</button>
+          </div>
+        `:html`
+          <div style=${{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px"}}>
+            ${["L","R"].map(side=>html`
+              <div key=${side} style=${{display:"flex",flexDirection:"column",gap:"5px"}}>
+                <div style=${{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(255,255,255,.25)",paddingLeft:"2px"}}>${side==="L"?"Palabras":"Traducciones"}</div>
+                ${mp?.[side]?.map(item=>{
+                  const iD=mDone.includes(item.pid),iS=mSel?.id===item.id,iE=mErr.includes(item.id);
+                  return html`<button key=${item.id} onClick=${()=>mClick(item)} disabled=${iD}
+                    style=${{padding:"11px 13px",borderRadius:"12px",border:"1px solid",fontSize:"13px",fontWeight:600,textAlign:"left",cursor:iD?"default":"pointer",transition:"all .15s",
+                      background:iD?"rgba(16,185,129,.15)":iS?(side==="L"?"rgba(79,70,229,.35)":"rgba(109,40,217,.35)"):iE?"rgba(239,68,68,.2)":"rgba(255,255,255,.04)",
+                      borderColor:iD?"rgba(52,211,153,.4)":iS?"rgba(165,180,252,.6)":iE?"rgba(248,113,113,.5)":"rgba(255,255,255,.08)",
+                      color:iD?"#6ee7b7":iE?"#fca5a5":"#fff",transform:iS?"scale(1.02)":"scale(1)"}}>
+                    ${iD?"✓ ":""}${item.text}
+                  </button>`;
+                })}
+              </div>
+            `)}
+          </div>
+        `}
+      </div>
+    `;
+  }
+
+  if(done){
+    const pct=Math.round((sRef.current/wRef.current.length)*100);
+    return html`
+      <div class="card" style=${{padding:"40px",textAlign:"center",maxWidth:"360px",margin:"0 auto",background:"linear-gradient(135deg,rgba(109,40,217,.3),rgba(79,70,229,.25))",border:"1px solid rgba(99,102,241,.2)"}}>
+        <div style=${{fontSize:"46px",marginBottom:"10px"}}>${pct>=80?"🏆":pct>=60?"👍":"💪"}</div>
+        <div class="syne" style=${{fontSize:"32px",color:"#fff"}}>${sRef.current}/${wRef.current.length}</div>
+        <div style=${{fontSize:"16px",color:"rgba(255,255,255,.5)",marginTop:"3px"}}>${pct}% correcto</div>
+        <div class="sbar" style=${{margin:"13px 0"}}><div class="sbar-fill" style=${{width:`${pct}%`,background:"linear-gradient(90deg,#6366f1,#8b5cf6)"}}></div></div>
+        <div style=${{fontSize:"13px",color:"rgba(255,255,255,.45)"}}>${pct>=80?"¡Excelente!":pct>=60?"¡Bien! Revisa lo que fallaste.":"¡Sigue practicando!"}</div>
+        <div style=${{display:"flex",gap:"8px",marginTop:"16px"}}>
+          <button class="btn btn-primary" style=${{flex:1}} onClick=${()=>start(mode)}>Reintentar</button>
+          <button class="btn btn-ghost" style=${{flex:1}} onClick=${()=>setMode(null)}>← Menú</button>
+        </div>
+      </div>
+    `;
+  }
+
+  const word=wRef.current[qIdx];if(!word)return null;
+  const cat=CATS[word.type]||CATS.noun;
+  return html`
+    <div style=${{maxWidth:"480px",margin:"0 auto",display:"flex",flexDirection:"column",gap:"13px"}}>
+      <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div><div style=${{fontSize:"12px",color:"rgba(255,255,255,.4)"}}>Pregunta ${qIdx+1}/${wRef.current.length}</div><div class="syne" style=${{fontSize:"17px",color:"#fff",marginTop:"2px"}}>Score: ${score}</div></div>
+        <div style=${{display:"flex",alignItems:"center",gap:"10px"}}>
+          <div style=${{position:"relative",width:"42px",height:"42px"}}>
+            <svg width="42" height="42" style=${{transform:"rotate(-90deg)"}}>
+              <circle cx="21" cy="21" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/>
+              <circle cx="21" cy="21" r="16" fill="none" stroke-width="4" stroke-linecap="round" stroke=${tC} stroke-dasharray=${`${2*Math.PI*16}`} stroke-dashoffset=${`${2*Math.PI*16*(1-tPct/100)}`} style=${{transition:"stroke-dashoffset 1s linear"}}/>
+            </svg>
+            <span style=${{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",fontWeight:900,color:"#fff"}}>${timer}</span>
+          </div>
+          <button class="btn btn-ghost" style=${{padding:"6px 10px"}} onClick=${()=>setMode(null)}>✕</button>
+        </div>
+      </div>
+      <div class="sbar"><div class="sbar-fill" style=${{width:`${((qIdx+1)/wRef.current.length)*100}%`,background:`linear-gradient(90deg,${cat.color},#8b5cf6)`}}></div></div>
+      <div class="card" style=${{padding:"24px",textAlign:"center",background:`linear-gradient(135deg,${cat.bg},rgba(15,20,40,.8))`,border:`1px solid ${cat.border}`}}>
+        <div style=${{fontSize:"10px",textTransform:"uppercase",letterSpacing:"2px",color:cat.color,opacity:.8,marginBottom:"7px"}}>${cat.icon} ${cat.label}</div>
+        <div class="syne" style=${{fontSize:"30px",color:"#fff",marginBottom:"4px"}}>${word.word}</div>
+        <div style=${{fontSize:"12px",color:"rgba(255,255,255,.35)",fontFamily:"monospace",marginBottom:"6px"}}>${word.phonetic}</div>
+        ${word.type==="irregular_verb"&&word.past&&html`<div style=${{fontSize:"11px",color:"rgba(248,113,113,.6)",marginBottom:"6px"}}>${word.word} → ${word.past} → ${word.past_participle}</div>`}
+        <button onClick=${()=>speak(word.word)} style=${{width:"34px",height:"34px",borderRadius:"10px",background:cat.bg,border:`1px solid ${cat.border}`,cursor:"pointer",fontSize:"14px",margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"center"}}>🔊</button>
+      </div>
+
+      ${mode==="mc"&&html`
+        <div style=${{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",minHeight:"140px"}}>
+          ${opts.map((opt,i)=>{
+            const isC=opt===word.translation,isS=sel===opt,isT=sel==="__to__";
+            let bg="rgba(255,255,255,.04)",bc="rgba(255,255,255,.08)",c="#fff";
+            if(shown){if(isC){bg="rgba(16,185,129,.2)";bc="rgba(52,211,153,.5)";c="#6ee7b7";}else if(isS&&!isC){bg="rgba(239,68,68,.2)";bc="rgba(248,113,113,.5)";c="#fca5a5";}else{bg="rgba(255,255,255,.02)";bc="rgba(255,255,255,.04)";c="rgba(255,255,255,.25)";}}
+            return html`<button key=${i} onClick=${()=>{if(!shown)answer(opt);}}
+              style=${{padding:"12px 13px",borderRadius:"12px",border:`1px solid ${bc}`,background:bg,color:c,fontSize:"13px",fontWeight:600,textAlign:"left",cursor:shown?"default":"pointer",transition:"all .15s"}}>
+              <span style=${{color:"rgba(255,255,255,.25)",marginRight:"6px"}}>${["A","B","C","D"][i]}.</span>${opt}
+              ${shown&&isC&&" ✓"}${shown&&isT&&isC&&html`<span style=${{fontSize:"10px",color:"#6ee7b7"}}> ← correcta</span>`}
+            </button>`;
+          })}
+        </div>
+      `}
+
+      ${mode==="fill"&&html`
+        <div style=${{display:"flex",flexDirection:"column",gap:"8px"}}>
+          <input class="inp" value=${fill} onInput=${e=>setFill(e.target.value)} onKeyDown=${e=>{if(e.key==="Enter"&&!shown)answer(fill);}} disabled=${shown}
+            placeholder="Escribe la traducción en español…"
+            style=${{fontSize:"14px",fontWeight:600,
+              background:shown?(fill.toLowerCase().trim()===word.translation?.toLowerCase().trim()?"rgba(16,185,129,.15)":"rgba(239,68,68,.15)"):"rgba(255,255,255,.06)",
+              borderColor:shown?(fill.toLowerCase().trim()===word.translation?.toLowerCase().trim()?"rgba(52,211,153,.5)":"rgba(248,113,113,.5)"):"rgba(255,255,255,.11)",
+              color:shown?(fill.toLowerCase().trim()===word.translation?.toLowerCase().trim()?"#6ee7b7":"#fca5a5"):"#fff"}}/>
+          ${!shown&&html`<button class="btn btn-primary" style=${{justifyContent:"center"}} onClick=${()=>answer(fill)}>Verificar ✓</button>`}
+          ${shown&&html`
+            <div style=${{borderRadius:"12px",padding:"10px 13px",fontSize:"13px",
+              background:fill.toLowerCase().trim()===word.translation?.toLowerCase().trim()?"rgba(16,185,129,.12)":"rgba(239,68,68,.12)",
+              border:`1px solid ${fill.toLowerCase().trim()===word.translation?.toLowerCase().trim()?"rgba(52,211,153,.3)":"rgba(248,113,113,.3)"}`,
+              color:fill.toLowerCase().trim()===word.translation?.toLowerCase().trim()?"#6ee7b7":"#fca5a5"}}>
+              ${fill.toLowerCase().trim()===word.translation?.toLowerCase().trim()?"✅ ¡Correcto!":"❌ Respuesta: "}<strong>${word.translation}</strong>
+            </div>
+          `}
+        </div>
+      `}
+
+      ${shown&&html`
+        <div style=${{display:"flex",flexDirection:"column",gap:"7px"}}>
+          ${word.examples?.[0]&&html`<div style=${{fontSize:"12px",color:"rgba(255,255,255,.35)",textAlign:"center",fontStyle:"italic"}}>"${word.examples[0]}"</div>`}
+          <button class="btn btn-primary" style=${{justifyContent:"center"}} onClick=${nxt}>
+            ${qIdx+1>=wRef.current.length?"Ver resultados 🏆":"Siguiente →"}
+          </button>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BRAIN TAB
+// ═══════════════════════════════════════════════════════════════
+function BrainTab({vocab,sr,updateSR}){
+  const [session,setSession]=useState(null);
+  const [rIdx,setRIdx]=useState(0);
+  const [revealed,setRevealed]=useState(false);
+  const [sessionDone,setSessionDone]=useState(false);
+  const [ratedCount,setRatedCount]=useState(0);
+  const streak=loadStreak().streak;
+  const due=useMemo(()=>getDueWords(vocab,sr),[vocab,sr]);
+  const mastered=useMemo(()=>vocab.filter(w=>getSREntry(sr,w.id).strength>=4).length,[vocab,sr]);
+  const totalReviews=useMemo(()=>Object.values(sr).reduce((a,e)=>a+(e.reviews||0),0),[sr]);
+  const catBreakdown=useMemo(()=>{const bd={};vocab.forEach(w=>{bd[w.type]=(bd[w.type]||0)+1;});return Object.entries(bd).sort((a,b)=>b[1]-a[1]);},[vocab]);
+  const memWords=useMemo(()=>[...vocab].sort((a,b)=>getSREntry(sr,b.id).strength-getSREntry(sr,a.id).strength),[vocab,sr]);
+  const LVL_C={A1:"#34d399",A2:"#10b981",B1:"#60a5fa",B2:"#818cf8",C1:"#f59e0b",C2:"#ef4444"};
+
+  const startSession=()=>{setSession("reviewing");setRIdx(0);setRevealed(false);setSessionDone(false);setRatedCount(0);};
+
+  const rate=(rating)=>{
+    const w=due[rIdx];if(w){updateSR(w.id,rating);updateStreak();}
+    setRatedCount(r=>r+1);
+    const next=rIdx+1;
+    if(next>=due.length)setSessionDone(true);
+    else{setRIdx(next);setRevealed(false);}
+  };
+
+  if(session==="reviewing"&&!sessionDone){
+    const w=due[rIdx];if(!w){setSessionDone(true);return null;}
+    const cat=CATS[w.type]||CATS.noun;
+    const srE=getSREntry(sr,w.id);
+    return html`
+      <div style=${{maxWidth:"460px",margin:"0 auto",display:"flex",flexDirection:"column",gap:"14px"}}>
+        <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div><div class="syne" style=${{fontSize:"18px",color:"#fff"}}>Sesión de Repaso</div><div style=${{fontSize:"12px",color:"rgba(255,255,255,.4)",marginTop:"2px"}}>${rIdx+1}/${due.length} · Completadas: ${ratedCount}</div></div>
+          <button class="btn btn-ghost" style=${{padding:"6px 12px"}} onClick=${()=>setSession(null)}>Salir</button>
+        </div>
+        <div class="sbar"><div class="sbar-fill" style=${{width:`${(rIdx/due.length)*100}%`,background:`linear-gradient(90deg,${cat.color},#8b5cf6)`}}></div></div>
+        <div class="card" style=${{padding:"28px",textAlign:"center",background:`linear-gradient(135deg,${cat.bg},rgba(15,20,35,.9))`,border:`1px solid ${cat.border}`}}>
+          <div style=${{fontSize:"10px",color:cat.color,textTransform:"uppercase",letterSpacing:"2px",marginBottom:"7px"}}>${cat.icon} ${cat.label}</div>
+          <div class="syne" style=${{fontSize:"32px",color:"#fff",marginBottom:"4px"}}>${w.word}</div>
+          <div style=${{fontSize:"12px",color:"rgba(255,255,255,.35)",fontFamily:"monospace",marginBottom:"7px"}}>${w.phonetic}</div>
+          ${w.type==="irregular_verb"&&w.past&&html`<div style=${{fontSize:"11px",color:"rgba(248,113,113,.6)",marginBottom:"6px"}}>${w.word} · ${w.past} · ${w.past_participle}</div>`}
+          <div style=${{fontSize:"11px",color:"rgba(255,255,255,.3)",marginBottom:"10px"}}>Fuerza: ${"⭐".repeat(srE.strength)||"—"}</div>
+          <button onClick=${()=>speak(w.word)} style=${{width:"36px",height:"36px",borderRadius:"10px",background:cat.bg,border:`1px solid ${cat.border}`,cursor:"pointer",fontSize:"15px",margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"center"}}>🔊</button>
+          ${!revealed&&html`<button class="btn btn-ghost" style=${{marginTop:"12px",justifyContent:"center",width:"100%"}} onClick=${()=>setRevealed(true)}>Ver respuesta 👁</button>`}
+          ${revealed&&html`
+            <div class="fadeUp" style=${{marginTop:"12px",padding:"13px",borderRadius:"13px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.09)"}}>
+              <div class="syne" style=${{fontSize:"20px",color:cat.color}}>${w.translation}</div>
+              <div style=${{fontSize:"12px",color:"rgba(255,255,255,.55)",marginTop:"4px",lineHeight:1.6}}>${w.definition}</div>
+              ${w.examples?.[0]&&html`<div style=${{fontSize:"11px",color:"rgba(255,255,255,.35)",marginTop:"4px",fontStyle:"italic"}}>"${w.examples[0]}"</div>`}
+              ${w.type==="connector"&&w.usage&&html`<div style=${{fontSize:"11px",color:"rgba(168,85,247,.7)",marginTop:"3px"}}>Uso: ${w.usage}</div>`}
+            </div>
+          `}
+        </div>
+        ${revealed&&html`
+          <div class="fadeUp" style=${{display:"flex",gap:"8px"}}>
+            <button style=${{flex:1,padding:"11px",borderRadius:"13px",background:"rgba(239,68,68,.15)",border:"1px solid rgba(239,68,68,.3)",color:"#f87171",fontSize:"13px",fontWeight:700,cursor:"pointer"}} onClick=${()=>rate("hard")}>😤 Difícil</button>
+            <button style=${{flex:1,padding:"11px",borderRadius:"13px",background:"rgba(99,102,241,.15)",border:"1px solid rgba(99,102,241,.3)",color:"#a5b4fc",fontSize:"13px",fontWeight:700,cursor:"pointer"}} onClick=${()=>rate("ok")}>👍 Bien</button>
+            <button style=${{flex:1,padding:"11px",borderRadius:"13px",background:"rgba(16,185,129,.15)",border:"1px solid rgba(16,185,129,.3)",color:"#6ee7b7",fontSize:"13px",fontWeight:700,cursor:"pointer"}} onClick=${()=>rate("easy")}>🎯 Fácil</button>
+          </div>
+          <div style=${{fontSize:"11px",color:"rgba(255,255,255,.2)",textAlign:"center"}}>😤 reinicia intervalo · 👍 mantiene · 🎯 avanza nivel</div>
+        `}
+      </div>
+    `;
+  }
+
+  if(sessionDone)return html`
+    <div class="card" style=${{padding:"40px",textAlign:"center",maxWidth:"360px",margin:"0 auto",background:"linear-gradient(135deg,rgba(16,185,129,.25),rgba(5,150,105,.2))",border:"1px solid rgba(16,185,129,.25)"}}>
+      <div style=${{fontSize:"48px",marginBottom:"10px"}}>🎉</div>
+      <div class="syne" style=${{fontSize:"20px",color:"#6ee7b7"}}>¡Sesión completada!</div>
+      <div style=${{fontSize:"13px",color:"rgba(255,255,255,.55)",marginTop:"5px"}}>Repasaste ${ratedCount} palabras · Progreso guardado</div>
+      <div style=${{fontSize:"22px",marginTop:"12px"}}>🔥 Racha: ${loadStreak().streak} días</div>
+      <button class="btn btn-green" style=${{marginTop:"16px",justifyContent:"center",width:"100%"}} onClick=${()=>setSession(null)}>Ver mi progreso</button>
+    </div>
+  `;
+
+  return html`
+    <div style=${{display:"flex",flexDirection:"column",gap:"16px"}}>
+      <!-- Stats -->
+      <div style=${{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))",gap:"10px"}}>
+        ${[
+          {icon:"🔥",val:streak,label:"Racha",color:"#f97316",bg:"rgba(249,115,22,.12)",border:"rgba(249,115,22,.25)"},
+          {icon:"📖",val:vocab.length,label:"Total",color:"#6366f1",bg:"rgba(99,102,241,.12)",border:"rgba(99,102,241,.25)"},
+          {icon:"⭐",val:mastered,label:"Dominadas",color:"#f59e0b",bg:"rgba(245,158,11,.12)",border:"rgba(245,158,11,.25)"},
+          {icon:"🔔",val:due.length,label:"Revisar",color:"#ef4444",bg:"rgba(239,68,68,.12)",border:"rgba(239,68,68,.25)"},
+          {icon:"📊",val:totalReviews,label:"Repasos",color:"#10b981",bg:"rgba(16,185,129,.12)",border:"rgba(16,185,129,.25)"},
+        ].map(s=>html`
+          <div key=${s.label} style=${{borderRadius:"15px",padding:"13px",background:s.bg,border:`1px solid ${s.border}`,textAlign:"center"}}>
+            <div style=${{fontSize:"20px"}}>${s.icon}</div>
+            <div class="syne" style=${{fontSize:"20px",color:s.color,marginTop:"3px"}}>${s.val}</div>
+            <div style=${{fontSize:"10px",color:"rgba(255,255,255,.4)",marginTop:"1px"}}>${s.label}</div>
+          </div>
+        `)}
+      </div>
+
+      <!-- Review session card -->
+      <div class="card" style=${{padding:"20px",background:due.length>0?"linear-gradient(135deg,rgba(239,68,68,.15),rgba(245,158,11,.1))":"linear-gradient(135deg,rgba(16,185,129,.12),rgba(5,150,105,.08))",border:`1px solid ${due.length>0?"rgba(239,68,68,.3)":"rgba(16,185,129,.25)"}`}}>
+        <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
+          <div>
+            <div class="syne" style=${{fontSize:"15px",color:due.length>0?"#fca5a5":"#6ee7b7"}}>
+              ${due.length>0?`🔔 ${due.length} palabras para repasar`:"✅ ¡Al día! No hay palabras pendientes"}
+            </div>
+            <div style=${{fontSize:"12px",color:"rgba(255,255,255,.45)",marginTop:"2px"}}>
+              ${due.length>0?"El repaso espaciado fortalece la memoria a largo plazo":"Vuelve mañana o agrega nuevas palabras"}
+            </div>
+          </div>
+          ${due.length>0&&html`
+            <button style=${{padding:"10px 20px",borderRadius:"13px",background:"linear-gradient(135deg,#ef4444,#f97316)",border:"none",color:"#fff",fontSize:"13px",fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}} onClick=${startSession}>
+              Iniciar sesión →
+            </button>
+          `}
+        </div>
+        ${due.length>0&&html`
+          <div style=${{marginTop:"10px",display:"flex",flexWrap:"wrap",gap:"5px"}}>
+            ${due.slice(0,8).map(w=>{const c=CATS[w.type]||CATS.noun;return html`
+              <span key=${w.id} style=${{fontSize:"11px",padding:"2px 8px",borderRadius:"20px",background:c.bg,color:c.color,border:`1px solid ${c.border}`,fontWeight:600}}>${c.icon} ${w.word}</span>
+            `;})}
+            ${due.length>8&&html`<span style=${{fontSize:"11px",padding:"2px 8px",borderRadius:"20px",background:"rgba(255,255,255,.06)",color:"rgba(255,255,255,.4)"}}>+${due.length-8} más</span>`}
+          </div>
+        `}
+      </div>
+
+      <!-- Category breakdown -->
+      <div class="card" style=${{padding:"18px"}}>
+        <div class="syne" style=${{fontSize:"14px",color:"#fff",marginBottom:"13px"}}>📊 Tu vocabulario por categoría</div>
+        <div style=${{display:"flex",flexDirection:"column",gap:"7px"}}>
+          ${catBreakdown.map(([type,count])=>{
+            const c=CATS[type]||CATS.noun;
+            const pct=Math.round((count/vocab.length)*100);
+            return html`
+              <div key=${type} style=${{display:"flex",alignItems:"center",gap:"9px"}}>
+                <div style=${{width:"120px",fontSize:"12px",color:c.color,fontWeight:600,flexShrink:0}}>${c.icon} ${c.label}</div>
+                <div style=${{flex:1,height:"5px",borderRadius:"5px",background:"rgba(255,255,255,.07)",overflow:"hidden"}}>
+                  <div style=${{height:"100%",borderRadius:"5px",background:c.color,width:`${pct}%`,opacity:.8}}></div>
+                </div>
+                <div style=${{width:"28px",fontSize:"11px",color:"rgba(255,255,255,.4)",textAlign:"right",flexShrink:0}}>${count}</div>
+              </div>
+            `;
+          })}
+          ${catBreakdown.length===0&&html`<div style=${{fontSize:"13px",color:"rgba(255,255,255,.3)",textAlign:"center",padding:"8px"}}>Agrega palabras para ver el desglose</div>`}
+        </div>
+      </div>
+
+      <!-- Memory map -->
+      <div class="card" style=${{padding:"18px"}}>
+        <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"11px"}}>
+          <div class="syne" style=${{fontSize:"14px",color:"#fff"}}>🗺️ Mapa de Memoria</div>
+          <div style=${{display:"flex",gap:"7px",fontSize:"10px",color:"rgba(255,255,255,.3)"}}>
+            ${[[0,"#4b5563","Nueva"],[2,"#f97316","En proceso"],[4,"#10b981","Dominada"]].map(([s,c,l])=>html`
+              <span key=${s} style=${{display:"flex",alignItems:"center",gap:"3px"}}><span style=${{width:"7px",height:"7px",borderRadius:"50%",background:c,display:"inline-block"}}></span>${l}</span>
+            `)}
+          </div>
+        </div>
+        <div style=${{display:"flex",flexWrap:"wrap",gap:"5px"}}>
+          ${memWords.map(w=>{
+            const srE=getSREntry(sr,w.id);const sc=getStrengthColor(srE.strength);const c=CATS[w.type]||CATS.noun;
+            return html`<div key=${w.id} title="${w.word} · ${w.translation} · Fuerza: ${srE.strength}/5"
+              style=${{padding:"3px 8px",borderRadius:"20px",fontSize:"11px",fontWeight:600,background:`${sc}22`,border:`1px solid ${sc}55`,color:sc}}>
+              ${c.icon} ${w.word}
+            </div>`;
+          })}
+          ${vocab.length===0&&html`<div style=${{fontSize:"13px",color:"rgba(255,255,255,.3)",padding:"8px"}}>Agrega palabras para ver el mapa</div>`}
+        </div>
+      </div>
+
+      <!-- SR guide -->
+      <div class="card" style=${{padding:"18px",background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.07))",border:"1px solid rgba(99,102,241,.2)"}}>
+        <div class="syne" style=${{fontSize:"14px",color:"#a5b4fc",marginBottom:"11px"}}>⚡ Cómo funciona el repaso espaciado</div>
+        <div style=${{display:"flex",flexDirection:"column",gap:"7px"}}>
+          ${[["😤 Difícil","Reinicia el intervalo → revisa mañana","#f87171"],["👍 Bien","Mantiene el nivel → mismo intervalo","#a5b4fc"],["🎯 Fácil","Sube de nivel → próximo intervalo más largo","#6ee7b7"],["📅 Intervalos","Nivel 0: 1d · 1: 3d · 2: 7d · 3: 14d · 4: 30d · 5: 90d","#fcd34d"]].map(([t,d,c])=>html`
+            <div key=${t} style=${{display:"flex",gap:"9px",alignItems:"flex-start"}}>
+              <span style=${{fontSize:"12px",fontWeight:700,color:c,minWidth:"75px",flexShrink:0}}>${t}</span>
+              <span style=${{fontSize:"12px",color:"rgba(255,255,255,.55)",lineHeight:1.5}}>${d}</span>
+            </div>
+          `)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GRAMMAR FORMULAS
+// ═══════════════════════════════════════════════════════════════
+function GrammarFormulas({onClose}){
+  const [activeGroup,setActiveGroup]=useState(0);
+  const [activeItem,setActiveItem]=useState(null);
+  const [search,setSearch]=useState("");
+  const LVL_C={A1:"#34d399",A2:"#10b981",B1:"#60a5fa",B2:"#818cf8",C1:"#f59e0b",C2:"#ef4444"};
+
+  const filtered=useMemo(()=>{
+    if(!search.trim())return GF;
+    const s=search.toLowerCase();
+    return GF.map(g=>({...g,items:g.items.filter(i=>i.name.toLowerCase().includes(s)||i.formula.toLowerCase().includes(s)||i.use.toLowerCase().includes(s)||i.level.toLowerCase().includes(s))})).filter(g=>g.items.length>0);
+  },[search]);
+
+  return html`
+    <div class="overlay" style=${{alignItems:"stretch",padding:"10px"}}>
+      <div style=${{width:"100%",maxWidth:"860px",margin:"0 auto",borderRadius:"22px",background:"#080d18",border:"1px solid rgba(255,255,255,.1)",boxShadow:"0 32px 100px rgba(0,0,0,.8)",display:"flex",flexDirection:"column",maxHeight:"100%",overflow:"hidden"}}>
+
+        <!-- Header -->
+        <div style=${{padding:"15px 20px",borderBottom:"1px solid rgba(255,255,255,.07)",display:"flex",alignItems:"center",gap:"12px",flexShrink:0,background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(249,115,22,.07))"}}>
+          <span style=${{fontSize:"24px"}}>📐</span>
+          <div style=${{flex:1}}>
+            <div class="syne" style=${{fontSize:"17px",color:"#fff"}}>Fórmulas Gramaticales</div>
+            <div style=${{fontSize:"11px",color:"rgba(255,255,255,.4)",marginTop:"1px"}}>A1 → C2 · ${GF.reduce((a,g)=>a+g.items.length,0)} fórmulas · Toca 🔊 para escuchar</div>
+          </div>
+          <div style=${{position:"relative"}}>
+            <span style=${{position:"absolute",left:"10px",top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,.25)",fontSize:"12px"}}>🔍</span>
+            <input class="inp" value=${search} onInput=${e=>setSearch(e.target.value)} placeholder="Buscar…" style=${{padding:"7px 11px 7px 29px",width:"150px",fontSize:"12px"}}/>
+          </div>
+          <button onClick=${onClose} style=${{width:"30px",height:"30px",borderRadius:"50%",background:"rgba(255,255,255,.08)",border:"none",cursor:"pointer",color:"rgba(255,255,255,.6)",fontSize:"14px",flexShrink:0}}>✕</button>
+        </div>
+
+        <div style=${{display:"flex",flex:1,overflow:"hidden",minHeight:0}}>
+          <!-- Sidebar -->
+          <div style=${{width:"180px",flexShrink:0,borderRight:"1px solid rgba(255,255,255,.06)",overflowY:"auto",padding:"8px 6px"}}>
+            ${(search?filtered:GF).map((g,i)=>html`
+              <button key=${i} onClick=${()=>{setActiveGroup(i);setActiveItem(null);}}
+                style=${{width:"100%",padding:"8px 11px",borderRadius:"11px",border:"none",cursor:"pointer",textAlign:"left",marginBottom:"2px",transition:"all .15s",
+                  background:activeGroup===i&&!search?"rgba(255,255,255,.08)":"transparent",
+                  color:activeGroup===i&&!search?"#fff":"rgba(255,255,255,.45)",fontSize:"12px",fontWeight:activeGroup===i&&!search?700:500,
+                  display:"flex",alignItems:"center",gap:"6px"}}>
+                <span style=${{fontSize:"13px"}}>${g.group.split(" ")[0]}</span>
+                <span style=${{flex:1,lineHeight:1.3,fontSize:"11px"}}>${g.group.split(" ").slice(1).join(" ")}</span>
+                <span style=${{fontSize:"9px",padding:"1px 5px",borderRadius:"9px",background:"rgba(255,255,255,.07)",color:"rgba(255,255,255,.35)"}}>${g.items.length}</span>
+              </button>
+            `)}
+          </div>
+
+          <!-- Formulas list -->
+          <div style=${{flex:1,overflowY:"auto",padding:"13px"}}>
+            ${(search?filtered:filtered.filter((_,i)=>i===activeGroup)).map((g,gi)=>html`
+              <div key=${gi}>
+                ${search&&html`<div class="syne" style=${{fontSize:"13px",color:g.color,marginBottom:"9px",marginTop:gi>0?"16px":0}}>${g.group}</div>`}
+                <div style=${{display:"flex",flexDirection:"column",gap:"7px"}}>
+                  ${g.items.map((item,ii)=>{
+                    const isOpen=activeItem===`${gi}-${ii}`;
+                    return html`
+                      <div key=${ii} style=${{borderRadius:"14px",border:`1px solid ${isOpen?g.color+"66":"rgba(255,255,255,.07)"}`,overflow:"hidden",background:isOpen?`${g.color}10`:"rgba(255,255,255,.02)",transition:"border-color .2s"}}>
+                        <div onClick=${()=>setActiveItem(isOpen?null:`${gi}-${ii}`)} style=${{padding:"11px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"10px"}}>
+                          <div style=${{flex:1}}>
+                            <div style=${{display:"flex",alignItems:"center",gap:"7px",flexWrap:"wrap"}}>
+                              <span class="syne" style=${{fontSize:"13px",color:"#fff"}}>${item.name}</span>
+                              <span style=${{fontSize:"9px",fontWeight:700,padding:"2px 6px",borderRadius:"20px",background:`${LVL_C[item.level]}22`,color:LVL_C[item.level],border:`1px solid ${LVL_C[item.level]}44`}}>${item.level}</span>
+                            </div>
+                            <div style=${{fontSize:"11px",fontFamily:"monospace",color:g.color,marginTop:"3px",lineHeight:1.5}}>${item.formula}</div>
+                          </div>
+                          <div style=${{display:"flex",gap:"6px",flexShrink:0}}>
+                            <button onClick=${e=>{e.stopPropagation();speak(item.ex);}} style=${{width:"26px",height:"26px",borderRadius:"7px",background:`${g.color}22`,border:`1px solid ${g.color}44`,cursor:"pointer",fontSize:"11px",color:g.color,display:"flex",alignItems:"center",justifyContent:"center"}}>🔊</button>
+                            <span style=${{color:"rgba(255,255,255,.3)",fontSize:"11px",display:"flex",alignItems:"center"}}>${isOpen?"▲":"▼"}</span>
+                          </div>
+                        </div>
+                        ${isOpen&&html`
+                          <div class="fadeUp" style=${{padding:"0 14px 12px",borderTop:"1px solid rgba(255,255,255,.05)"}}>
+                            <div style=${{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:"8px",marginTop:"9px"}}>
+                              <div style=${{borderRadius:"11px",padding:"9px 11px",background:"rgba(16,185,129,.08)",border:"1px solid rgba(16,185,129,.2)"}}>
+                                <div style=${{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(52,211,153,.6)",marginBottom:"3px"}}>✅ Affirmative</div>
+                                <div style=${{fontSize:"12px",fontStyle:"italic",color:"rgba(255,255,255,.8)",lineHeight:1.5}}>"${item.ex}"</div>
+                                <button onClick=${()=>speak(item.ex)} style=${{marginTop:"4px",fontSize:"10px",color:"rgba(52,211,153,.5)",background:"none",border:"none",cursor:"pointer",padding:0}}>🔊 Escuchar</button>
+                              </div>
+                              ${item.neg&&item.neg!=="—"&&html`
+                                <div style=${{borderRadius:"11px",padding:"9px 11px",background:"rgba(239,68,68,.08)",border:"1px solid rgba(239,68,68,.2)"}}>
+                                  <div style=${{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(248,113,113,.6)",marginBottom:"3px"}}>❌ Negative</div>
+                                  <div style=${{fontSize:"12px",fontStyle:"italic",color:"rgba(255,255,255,.8)",lineHeight:1.5}}>"${item.neg}"</div>
+                                  <button onClick=${()=>speak(item.neg)} style=${{marginTop:"4px",fontSize:"10px",color:"rgba(248,113,113,.5)",background:"none",border:"none",cursor:"pointer",padding:0}}>🔊 Escuchar</button>
+                                </div>
+                              `}
+                              ${item.q&&item.q!=="—"&&html`
+                                <div style=${{borderRadius:"11px",padding:"9px 11px",background:"rgba(99,102,241,.08)",border:"1px solid rgba(99,102,241,.2)"}}>
+                                  <div style=${{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(165,180,252,.6)",marginBottom:"3px"}}>❓ Question</div>
+                                  <div style=${{fontSize:"12px",fontStyle:"italic",color:"rgba(255,255,255,.8)",lineHeight:1.5}}>"${item.q}"</div>
+                                  <button onClick=${()=>speak(item.q)} style=${{marginTop:"4px",fontSize:"10px",color:"rgba(165,180,252,.5)",background:"none",border:"none",cursor:"pointer",padding:0}}>🔊 Escuchar</button>
+                                </div>
+                              `}
+                              <div style=${{borderRadius:"11px",padding:"9px 11px",background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.2)"}}>
+                                <div style=${{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"rgba(253,211,77,.6)",marginBottom:"3px"}}>💡 Cuándo usarlo</div>
+                                <div style=${{fontSize:"12px",color:"rgba(255,255,255,.75)",lineHeight:1.5}}>${item.use}</div>
+                              </div>
+                            </div>
+                            <div style=${{borderRadius:"10px",padding:"8px 11px",background:"rgba(0,0,0,.3)",border:`1px solid ${g.color}33`,fontFamily:"monospace",fontSize:"11px",color:g.color,lineHeight:1.6,marginTop:"8px"}}>
+                              📐 ${item.formula}
+                            </div>
+                          </div>
+                        `}
+                      </div>
+                    `;
+                  })}
+                </div>
+              </div>
+            `)}
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style=${{padding:"9px 20px",borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,background:"rgba(0,0,0,.3)"}}>
+          <div style=${{fontSize:"11px",color:"rgba(255,255,255,.3)"}}>${GF.reduce((a,g)=>a+g.items.length,0)} fórmulas · A1 a C2</div>
+          <div style=${{display:"flex",gap:"5px"}}>
+            ${["A1","A2","B1","B2","C1","C2"].map(l=>html`<span key=${l} style=${{fontSize:"9px",padding:"2px 6px",borderRadius:"20px",background:`${LVL_C[l]}18`,color:LVL_C[l],border:`1px solid ${LVL_C[l]}33`,fontWeight:700}}>${l}</span>`)}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── RENDER ────────────────────────────────────────────────
+render(html`<${App}/>`, document.getElementById("root"));
+</script>
+</body>
+</html>
